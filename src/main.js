@@ -2,6 +2,7 @@ import BootScene from './scenes/BootScene.js';
 import MainMenu from './scenes/MainMenu.js';
 import SettingsMenu from './scenes/SettingsMenu.js';
 import OfficeScene from './scenes/OfficeScene.js';
+import StoryIntroScene from './scenes/StoryIntroScene.js';
 
 const config = {
   type: Phaser.AUTO,
@@ -10,7 +11,7 @@ const config = {
     mode: Phaser.Scale.RESIZE,
     autoCenter: Phaser.Scale.CENTER_BOTH
   },
-  scene: [BootScene, MainMenu, SettingsMenu, OfficeScene]
+  scene: [BootScene, MainMenu, SettingsMenu, OfficeScene, StoryIntroScene]
 };
 
 new Phaser.Game(config);
