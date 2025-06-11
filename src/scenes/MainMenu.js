@@ -43,7 +43,10 @@ export default class MainMenu extends Phaser.Scene {
       .on('pointerout', () => menuItem.setStyle({ fill: '#00FF00' }))
       .on('pointerdown', () => {
         if (text === 'Ajustes') this.scene.start('SettingsMenu');
-        else if (text === 'Modo Historia') this.scene.start('StoryIntroScene');
+        else if (text === 'Modo Historia') {
+          this.sys.game.music.stop();
+          this.scene.start('StoryIntroScene');
+        }
         else this.scene.start('OfficeScene');
       });
 

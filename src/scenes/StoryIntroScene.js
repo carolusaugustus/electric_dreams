@@ -4,7 +4,7 @@ export default class StoryIntroScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.audio('inGameMusic', 'assets/audio/in_game_audio.m4a');
+    this.load.audio('inGameMusic', 'assets/in_game_audio.m4a');
   }
 
   create() {
@@ -41,7 +41,7 @@ Y mi trabajo es descubrirlos.
     continueText.setAlpha(0); // invisible al principio
 
     // Mostrar texto de continuar tras 10s
-    this.time.delayedCall(10000, () => {
+    this.time.delayedCall(5000, () => {
       this.tweens.add({
         targets: continueText,
         alpha: 1,
