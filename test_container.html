@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Test Phaser Container</title>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+    <style>
+      body {
+        margin: 0;
+        background: #000;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      const config = {
+        type: Phaser.AUTO,
+        width: 800,
+        height: 600,
+        backgroundColor: '#222222',
+        scene: {
+          preload,
+          create
+        }
+      };
+
+      const game = new Phaser.Game(config);
+
+      function preload() {
+        this.load.image('panel', '/assets/HUD_Data_v2.png'); // Imagen segura desde CDN
+      }
+
+      function create() {
+        // Añadir imagen (posición relativa al container)
+        const panel = this.add.image(0, 0, 'panel').setOrigin(0);
+
+        // Añadir texto
+        const text = this.add.text(20, 20, 'Nombre:\nCarlos Ortega', {
+          fontFamily: 'monospace',
+          fontSize: '18px',
+          color: '#00ffcc',
+          lineSpacing: 6
+        });
+
+        // Crear container con ambos elementos
+        const container = this.add.container(100, 100, [panel, text]);
+
+        // Escalar y mover todo como si fuera una sola "caja"
+        container.setScale(0.5);
+        container.setDepth(10);
+
+        // Interactividad opcional
+        container.setSize(panel.width, panel.height);
+        container.setInteractive();
+        container.on('pointerdown', () => {
+          text.setText('¡Haz hecho clic!');
+        });
+      }
+    </script>
+  </body>
+</html>

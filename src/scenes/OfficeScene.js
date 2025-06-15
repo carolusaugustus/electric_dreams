@@ -12,7 +12,7 @@ export default class OfficeScene extends Phaser.Scene {
     this.load.image('rain2', '/assets/rain_drop_sprite_2.png');
     this.load.image('rain3', '/assets/rain_drop_sprite_3.png');
     this.load.image('rain_trace', '/assets/rain_trace.png');
-    this.load.image('hud_data', 'assets/HUD_Data_v2.png');
+    this.load.image('hud_data', '/assets/HUD_Data_v2.png');
     this.load.image('hud_questions', 'assets/HUD_Questions.png');
     this.load.image('btn_questions', 'assets/questions_button.png');
 
@@ -92,8 +92,9 @@ export default class OfficeScene extends Phaser.Scene {
       // ...
     ];
 
-    // Añadir textos clicables (opcionalmente organizados en carpetas)
-    this.questionTexts = [];
+    // this.questionGroup = this.add.container(20,140, this.questionPanel);
+    this.questionGroup = this.add.container(20, 140); // arreglo aquí
+    this.questionGroup.add(this.questionPanel);
 
     this.questionsList.forEach((q, idx) => {
       const text = this.add.text(width / 2 + 180, 160 + idx * 30, q.text, {
@@ -102,23 +103,22 @@ export default class OfficeScene extends Phaser.Scene {
         color: '#00ffcc',
         backgroundColor: '#111111'
       })
-        .setInteractive({ useHandCursor: true })
-        .setVisible(false)
-        .setDepth(7)
-        .on('pointerdown', () => this.askQuestion(q));
+      .setInteractive({ useHandCursor: true })
+      .setVisible(false)
+      .setDepth(7)
+      .on('pointerdown', () => this.askQuestion(q));
 
-      this.questionTexts.push(text);
+      this.questionGroup.add(text);
     });
-
-    this.questionGroup = this.add.container(20,140, [this.questionPanel, this.questionTexts]);
-    this.questionGroup.setScale(0.25);
+    
+    this.questionGroup.setVisible(false);
+    this.questionGroup.setScale(0.40);
     this.questionGroup.setDepth(10);
 
     // Función para mostrar u ocultar panel
     this.toggleQuestionPanel = () => {
-      const visible = !this.questionPanel.visible;
-      this.questionPanel.setVisible(visible);
-      this.questionTexts.forEach(t => t.setVisible(visible));
+      const visible = !this.questionGroup.visible;
+      this.questionGroup.setVisible(visible);
     };
 
     this.askQuestion = (questionObj) => {

@@ -14,4 +14,4 @@ const config = {
   scene: [BootScene, MainMenu, SettingsMenu, OfficeScene, StoryIntroScene]
 };
 
-new Phaser.Game(config);
+const mainGame = new Phaser.Game(config);
