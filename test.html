@@ -1,0 +1,126 @@
+<html>
+<head>
+    <title>Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        h1 {
+            color: #4CAF50;
+        }
+        p {
+            font-size: 16px;
+        }
+    </style>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3/dist/phaser.js"></script>
+</head>
+<body>
+    <div id="phaser-example"></div>
+    <script>
+        class Example extends Phaser.Scene {
+            constructor() {
+                super({ key: 'Example' });
+            }
+
+            preload() {
+                this.load.image('sky', 'https://labs.phaser.io/assets/skies/sky2.png');
+                this.load.image('rain1', '/assets/rain_drop_sprite_1.png');
+                this.load.image('rain2', '/assets/rain_drop_sprite_2.png');
+                this.load.image('rain3', '/assets/rain_drop_sprite_3.png');
+                this.load.image('rain_trace', '/assets/rain_trace.png');
+            }
+
+            create() {
+                this.add.image(400, 300, 'sky');
+
+                const particles = this.add.particles(0, 100, 'rain_trace', {
+                    x: { min: 100, max: 700 },
+                    lifespan: 2000,
+                    speedY: { min: 200, max: 400 },
+                    scale: { start: 0.5, end: 0.1 },
+                    gravityY: 200,
+                    blendMode: 'ADD',
+                    frequency: 20
+                });
+                // Lluvia tras la oficina (fina)
+                // const rainBack = this.add.particles(0, 100,'rain1', {
+                //      x: { min: 100, max: 700 },
+                //     lifespan: 2000,
+                //     speedY: { min: 200, max: 400 },
+                //     scale: { start: 0.5, end: 0.1 },
+                //     gravityY: 200,
+                //     blendMode: 'NORMAL',
+                //     quantity: 10,
+                //     frequency: 20
+                //     // x: { min: 0, max: config.width },
+                //     // y: 0,
+                //     // lifespan: 2000,
+                //     // speedY: { min: 100, max: 200 },
+                //     // scale: { start: 0.3, end: 0 },
+                //     // quantity: 10,
+                //     // blendMode: 'NORMAL',
+                //     , depth: 2
+                // });
+
+                // // Lluvia media
+                // const rainMid = this.add.particles(0, 100,'rain2',{
+                //      x: { min: 100, max: 700 },
+                //     lifespan: 2000,
+                //     speedY: { min: 200, max: 400 },
+                //     scale: { start: 0.5, end: 0.1 },
+                //     gravityY: 200,
+                //     blendMode: 'ADD',
+                //     quantity: 2,
+                //     frequency: 20
+                //     // x: { min: 0, max: config.width },
+                //     // y: 0,
+                //     // lifespan: 1500,
+                //     // speedY: { min: 250, max: 400 },
+                //     // scale: { start: 0.35, end: 0 },
+                //     // quantity: 2,
+                //     // blendMode: 'ADD',
+                //     ,depth: 3
+                // });
+
+                // // Lluvia intensa cercana
+                // const rainFront = this.add.particles(0, 100,'rain3',{
+                //      x: { min: 100, max: 700 },
+                //     lifespan: 2000,
+                //     speedY: { min: 200, max: 400 },
+                //     scale: { start: 0.5, end: 0.1 },
+                //     gravityY: 200,
+                //     blendMode: 'ADD',
+                //     quantity: 3,
+                //     frequency: 20
+                //     // x: { min: 0, max: config.width },
+                //     // y: 0,
+                //     // lifespan: 1000,
+                //     // speedY: { min: 350, max: 600 },
+                //     // scale: { start: 0.5, end: 0 },
+                //     // quantity: 3,
+                //     // blendMode: 'ADD',
+                //     ,depth: 4
+                // });
+            }
+        }
+
+        const config = {
+            type: Phaser.AUTO,
+            width: 800,
+            height: 600,
+            backgroundColor: '#000',
+            parent: 'phaser-example',
+            scene: Example
+        };
+
+        const game = new Phaser.Game(config);
+        // ✅ Mover el evento DOMContentLoaded aquí para asegurar el orden
+        document.addEventListener("DOMContentLoaded", function () {
+            console.log("Phaser game should be running now.");
+        });
+    </script>
+</body>
+</html>

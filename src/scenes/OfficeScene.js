@@ -7,10 +7,14 @@ export default class OfficeScene extends Phaser.Scene {
     // Fondos y elementos visuales
     this.load.image('city', 'assets/city.png');
     this.load.image('office', 'assets/office.png');
-    this.load.image('rain', 'assets/rain_trace.png');
     this.load.image('subject', 'assets/profiles/others/neutral_sit_1.png');
-    //this.load.image('hud_data', 'assets/HUD_Data_v2.png');
-    //this.load.image('hud_questions', 'assets/HUD_Questions.png');
+    this.load.image('rain1', '/assets/rain_drop_sprite_1.png');
+    this.load.image('rain2', '/assets/rain_drop_sprite_2.png');
+    this.load.image('rain3', '/assets/rain_drop_sprite_3.png');
+    this.load.image('rain_trace', '/assets/rain_trace.png');
+    this.load.image('hud_data', 'assets/HUD_Data_v2.png');
+    this.load.image('hud_questions', 'assets/HUD_Questions.png');
+    this.load.image('btn_questions', 'assets/questions_button.png');
 
     // Audio
     this.load.audio('in_game_music', 'assets/in_game_audio.m4a');
@@ -19,25 +23,13 @@ export default class OfficeScene extends Phaser.Scene {
   create() {
     const { width, height } = this.sys.game.canvas;
 
-    // FONDO
-    // this.add.image(width / 2, height / 2, 'city').setDepth(0);
-    // this.add.image(width / 2, height / 2, 'office').setDepth(1);
-
-    // LLUVIA
-    // this.rain = this.add.tileSprite(width / 2, height / 2, width, height, 'rain');
-    // this.rain.setDepth(2);
-    // this.rain.setScrollFactor(0);
-
+    // FONDO CIUDAD
     this.city = this.add.image(0, 0, 'city')
     .setOrigin(0)
     .setDisplaySize(width * 0.85, height * 0.85)
     .setDepth(0);
 
-    this.rain = this.add.tileSprite(0, 0, width, height, 'rain')
-      .setOrigin(0)
-      .setAlpha(0.25)
-      .setDepth(1);
-
+    // OFICINA
     this.office = this.add.image(0, 0, 'office')
       .setOrigin(0)
       .setDisplaySize(width, height)
@@ -50,18 +42,213 @@ export default class OfficeScene extends Phaser.Scene {
     this.subject.setDepth(3);
 
     // HUDs
-    // this.add.image(180, 140, 'hud_data').setOrigin(0, 0).setDepth(4).setScale(0.85);
-    // this.add.image(width / 2, height - 140, 'hud_questions').setDepth(4).setScale(0.95);
+    this.subjectHUD = this.add.image(20, 140, 'hud_data')
+      .setOrigin(0, 0)
+      .setDepth(10)
+      .setScale(0.25);
+
+    // Datos ficticios de prueba (puedes reemplazar con carga dinámica)
+    this.subjectInfoText = this.add.text(40, 160,
+      `Nombre:\nMaria Volk\n\nEdad:\n34\n\nSexo:\nMujer\n\nOrigen:\nTitan\n\nOcupación:\nXenobióloga`,
+      {
+        fontFamily: 'monospace',
+        fontSize: '15px',
+        color: '#00ffcc',
+        lineSpacing: 6
+      })
+      .setDepth(11);
+    //this.add.image(width / 2, height - 140, 'hud_questions').setDepth(4).setScale(0.95);
 
     // MÚSICA
-    // this.music = this.sound.add('in_game_music', {
-    //   loop: true,
-    //   volume: 0.4
-    // });
-    // this.music.play();
+    this.music = this.sound.add('in_game_music', {
+      loop: true,
+      volume: 0.4
+    });
+    this.music.play();
+
+    //MENU PREGUNTAS
+    // Botón de Preguntas
+    this.questionsButton = this.add.image(width - 30, 50, 'btn_questions')
+      .setOrigin(1, 0)
+      .setInteractive({ useHandCursor: true })
+      .setDepth(10)
+      .setScale(0.3);
+
+    this.questionsButton.on('pointerdown', () => {
+      this.toggleQuestionPanel();
+    });
+
+    // Paso 3: Panel de preguntas (inicialmente oculto)
+    this.questionPanel = this.add.image(width / 2 + 250, height / 2, 'hud_questions')
+      .setOrigin(0.5)
+      .setScale(0.35)
+      .setDepth(6)
+      .setVisible(false); // se muestra con el botón
+
+    // Lista de preguntas dummy (se puede cargar dinámicamente después)
+    this.questionsList = [
+      { id: 'empathy_1', text: '¿Qué sientes al ver a un niño llorando por un robot roto?', folder: 'Empatía' },
+      { id: 'violence_2', text: '¿Qué harías si ves a alguien golpear a un perro?', folder: 'Violencia' },
+      // ...
+    ];
+
+    // Añadir textos clicables (opcionalmente organizados en carpetas)
+    this.questionTexts = [];
+
+    this.questionsList.forEach((q, idx) => {
+      const text = this.add.text(width / 2 + 180, 160 + idx * 30, q.text, {
+        fontFamily: 'monospace',
+        fontSize: '14px',
+        color: '#00ffcc',
+        backgroundColor: '#111111'
+      })
+        .setInteractive({ useHandCursor: true })
+        .setVisible(false)
+        .setDepth(7)
+        .on('pointerdown', () => this.askQuestion(q));
+
+      this.questionTexts.push(text);
+    });
+
+    this.questionGroup = this.add.container(20,140, [this.questionPanel, this.questionTexts]);
+    this.questionGroup.setScale(0.25);
+    this.questionGroup.setDepth(10);
+
+    // Función para mostrar u ocultar panel
+    this.toggleQuestionPanel = () => {
+      const visible = !this.questionPanel.visible;
+      this.questionPanel.setVisible(visible);
+      this.questionTexts.forEach(t => t.setVisible(visible));
+    };
+
+    this.askQuestion = (questionObj) => {
+      // Mostrar la pregunta en el HUD
+      if (!this.questionText) {
+        this.questionText = this.add.text(width / 2, height - 180, '', {
+          fontFamily: 'monospace',
+          fontSize: '16px',
+          color: '#00ffcc'
+        }).setOrigin(0.5).setDepth(8);
+      }
+
+      this.questionText.setText(questionObj.text);
+      this.questionText.setVisible(true);
+
+      // Simular espera y respuesta fisiológica (latidos + parpadeo)
+      this.time.delayedCall(1500, () => {
+        this.showPhysiologicalResponse();
+      });
+    };
+
+    // Simular respuesta fisiológica
+    this.showPhysiologicalResponse = () => {
+      // Ejemplo básico: puedes hacer una animación más elaborada aquí
+      if (!this.heartRateText) {
+        this.heartRateText = this.add.text(width - 180, height - 100, '', {
+          fontFamily: 'monospace',
+          fontSize: '18px',
+          color: '#ff0000'
+        }).setDepth(9);
+      }
+
+      const bpm = Phaser.Math.Between(72, 120); // número simulado
+      this.heartRateText.setText(`Pulso: ${bpm} bpm`);
+      this.heartRateText.setVisible(true);
+
+      // Añade aquí animación de parpadeo en el ojo del sujeto si lo implementas
+    };
 
     // EFECTO LLUVIA
-    this.rainSpeed = 0.5;
+    // const particles = this.add.particles(0, 100, 'rain_trace', {
+    //     x: { min: 100, max: 700 },
+    //     lifespan: 2000,
+    //     speedY: { min: 200, max: 400 },
+    //     scale: { start: 0.5, end: 0.1 },
+    //     gravityY: 200,
+    //     blendMode: 'ADD',
+    //     frequency: 20
+    // });
+    // Lluvia tras la oficina (fina)
+    const rainBack = this.add.particles(0, 100,'rain1', {
+         x: { min: 0, max: width },
+        lifespan: 2000,
+        speedY: { min: 200, max: 400 },
+        scale: { start: 0.5, end: 0.1 },
+        gravityY: 200,
+        blendMode: 'NORMAL',
+        quantity: 10,
+        frequency: 20
+        // x: { min: 0, max: config.width },
+        // y: 0,
+        // lifespan: 2000,
+        // speedY: { min: 100, max: 200 },
+        // scale: { start: 0.3, end: 0 },
+        // quantity: 10,
+        // blendMode: 'NORMAL',
+        , depth: 2
+    });
+
+    // Lluvia media
+    const rainMid = this.add.particles(0, 100,'rain2',{
+         x: { min: 0, max: width },
+        lifespan: 2000,
+        speedY: { min: 200, max: 400 },
+        scale: { start: 0.5, end: 0.1 },
+        gravityY: 200,
+        blendMode: 'ADD',
+        quantity: 2,
+        frequency: 20
+        // x: { min: 0, max: config.width },
+        // y: 0,
+        // lifespan: 1500,
+        // speedY: { min: 250, max: 400 },
+        // scale: { start: 0.35, end: 0 },
+        // quantity: 2,
+        // blendMode: 'ADD',
+        ,depth: 3
+    });
+
+    // Lluvia intensa cercana
+    const rainFront = this.add.particles(0, 100,'rain3',{
+         x: { min: 0, width },
+        lifespan: 2000,
+        speedY: { min: 200, max: 400 },
+        scale: { start: 0.5, end: 0.1 },
+        gravityY: 200,
+        blendMode: 'ADD',
+        quantity: 3,
+        frequency: 20
+        // x: { min: 0, max: config.width },
+        // y: 0,
+        // lifespan: 1000,
+        // speedY: { min: 350, max: 600 },
+        // scale: { start: 0.5, end: 0 },
+        // quantity: 3,
+        // blendMode: 'ADD',
+        ,depth: 4
+    });
+
+    // Salpicaduras en la parte inferior de la pantalla
+    const splashY = height - 320; // Ajusta según necesites
+
+    const rainSplashes = this.add.particles(0, splashY, 'rain_trace', {
+      x: { min: 0, max: width },
+      lifespan: 500,
+      speedY: { min: -50, max: -100 },
+      scale: { start: 0.3, end: 0 },
+      quantity: 2,
+      blendMode: 'ADD',
+      frequency: 200
+    });
+
+    // Ajustar profundidad de capas para el orden correcto
+    this.city.setDepth(0);
+    rainBack.setDepth(1);
+    rainMid.setDepth(2);
+    rainFront.setDepth(3);
+    rainSplashes.setDepth(4);
+    this.office.setDepth(5);
+    this.subject.setDepth(6);
 
     // Placeholder de texto (para más adelante)
     // this.questionText = this.add.text(width / 2, height - 180, '', {
@@ -72,7 +259,6 @@ export default class OfficeScene extends Phaser.Scene {
   }
 
   update() {
-    // Scroll vertical de lluvia
-    this.rain.tilePositionY -= this.rainSpeed;
+    // Lluvia ahora gestionada por partículas, no es necesario hacer scroll.
   }
 }
