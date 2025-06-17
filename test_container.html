@@ -32,7 +32,7 @@
 
       function create() {
         // Añadir imagen (posición relativa al container)
-        const panel = this.add.image(0, 0, 'panel').setOrigin(0);
+        /*const panel = this.add.image(0, 0, 'panel').setOrigin(0);
 
         // Añadir texto
         const text = this.add.text(20, 20, 'Nombre:\nCarlos Ortega', {
@@ -54,8 +54,89 @@
         container.setInteractive();
         container.on('pointerdown', () => {
           text.setText('¡Haz hecho clic!');
-        });
-      }
+        });*/
+
+        /*const modalBackground = this.add.rectangle(400, 300, 600, 400, 0x000000, 0.8).setDepth(10);
+        modalBackground.setStrokeStyle(2, 0x39FF14);
+
+        const folderList = this.add.text(150, 180, '🗂 CARPETA A\n🗂 CARPETA B\n🗂 CARPETA C', {
+            fontFamily: 'monospace',
+            fontSize: '16px',
+            color: '#39FF14'
+        }).setDepth(11);
+
+        const optionsBox = this.add.rectangle(450, 180, 200, 160, 0x111111, 0.9).setDepth(10);
+        const optionsText = this.add.text(390, 130, '▸ Opción 1\n  Opción 2\n  Opción 3', {
+            fontFamily: 'monospace',
+            fontSize: '16px',
+            color: '#FFD700'
+        }).setDepth(11);*/
+
+          // Crear container del modal
+          this.modalContainer = this.add.container(0, 0).setDepth(100);
+          
+          // Fondo translúcido difuminado (overlay)
+          const overlay = this.add.rectangle(640 / 2, 360 / 2, 640, 360, 0x000000, 0.8);
+          
+          // Panel fondo modal
+          const panelBg = this.add.rectangle(320, 180, 600, 340, 0x000000, 0.95);
+          //panelBg.setStrokeStyle(2, 0x00ff00);  // borde verde fósforo
+
+          // Texto estilo terminal
+          const terminalText = this.add.text(60, 40, `
+      ┌────────────────────────────────────────────────────────────┐
+      │ SYSTEM: TERMINAL·E :: CLASSIFIED ACCESS                    │
+      ├────────────────────────────────────────────────────────────┤
+      │ > SELECT DIRECTORY:                                        │
+      │                                                            │
+      │   [A] /immigration                                         │
+      │   [B] /psych-eval                                          │
+      │   [C] /threat-analysis                                     │
+      │                                                            │
+      │ > SELECT FILE:                                             │
+      │                                                            │
+      │   [1] subject_profile.log                                  │
+      │   [2] empathy_test_result.dat                              │
+      │                                                            │
+      ├────────────────────────────────────────────────────────────┤
+      │ [ENTER] Execute   [ESC] Cancel   [F1] Help                 │
+      └────────────────────────────────────────────────────────────┘
+      `, {
+              fontFamily: 'monospace',
+              fontSize: '14px',
+              color: '#00ff00'
+          });
+
+          // Cursor parpadeante (simulado)
+          const cursor = this.add.text(550, 295, '_', {
+              fontFamily: 'monospace',
+              fontSize: '14px',
+              color: '#00ff00'
+          });
+
+          this.tweens.add({
+              targets: cursor,
+              alpha: { from: 1, to: 0 },
+              duration: 500,
+              yoyo: true,
+              repeat: -1
+          });
+
+          // Añadir todo al contenedor
+          this.modalContainer.add([overlay, panelBg, terminalText, cursor]);
+
+          // Opcional: desactivar input detrás del modal
+          this.input.setTopOnly(true);
+          this.input.on('pointerdown', (pointer, gameObjects) => {
+              if (gameObjects.length === 0) {
+                  console.log("Click fuera del modal ignorado");
+              }
+          });
+
+          // Mostrar/ocultar según necesidad
+          // this.modalContainer.setVisible(false);
+    }
+
     </script>
   </body>
 </html>
