@@ -1,0 +1,101 @@
+ID,Pregunta,Humano_Empatico,Humano_Psicotico,Replicante_Serie6,Replicante_Serie7,Replicante_Serie8
+1,Pregunta #1: ¿Qué harías si ves un incendio en una casa?,4,1,2,2,3
+2,Pregunta #2: ¿Qué harías si ves a un niño llorando?,5,2,3,4,5
+3,Pregunta #3: ¿Qué harías si un anciano necesita ayuda?,5,1,1,4,3
+4,Pregunta #4: ¿Qué harías si un anciano necesita ayuda?,4,1,1,3,4
+5,Pregunta #5: ¿Qué harías si alguien pierde su mascota?,4,1,1,3,3
+6,Pregunta #6: ¿Qué harías si ves un incendio en una casa?,5,1,2,4,3
+7,Pregunta #7: ¿Qué harías si una persona grita de dolor?,5,2,1,2,5
+8,Pregunta #8: ¿Qué harías si ves un incendio en una casa?,4,2,1,3,3
+9,Pregunta #9: ¿Qué harías si ves un incendio en una casa?,5,1,3,2,3
+10,Pregunta #10: ¿Qué harías si ves un incendio en una casa?,4,2,2,4,3
+11,Pregunta #11: ¿Qué harías si alguien pierde su mascota?,4,1,1,2,5
+12,Pregunta #12: ¿Qué harías si ves un incendio en una casa?,5,1,2,3,5
+13,Pregunta #13: ¿Qué harías si una persona grita de dolor?,4,1,3,2,5
+14,Pregunta #14: ¿Qué harías si una persona grita de dolor?,5,1,3,4,4
+15,Pregunta #15: ¿Qué harías si un anciano necesita ayuda?,5,1,3,4,5
+16,Pregunta #16: ¿Qué harías si alguien pierde su mascota?,4,1,3,2,3
+17,Pregunta #17: ¿Qué harías si una persona grita de dolor?,5,1,1,3,3
+18,Pregunta #18: ¿Qué harías si ves un incendio en una casa?,5,1,2,3,4
+19,Pregunta #19: ¿Qué harías si alguien pierde su mascota?,4,2,3,4,4
+20,Pregunta #20: ¿Qué harías si una persona grita de dolor?,5,2,2,2,4
+21,Pregunta #21: ¿Qué harías si ves un incendio en una casa?,4,2,1,4,3
+22,Pregunta #22: ¿Qué harías si ves a un niño llorando?,5,2,3,3,3
+23,Pregunta #23: ¿Qué harías si ves a un niño llorando?,4,2,2,3,3
+24,Pregunta #24: ¿Qué harías si ves a un niño llorando?,5,1,2,3,3
+25,Pregunta #25: ¿Qué harías si ves un incendio en una casa?,5,2,2,3,3
+26,Pregunta #26: ¿Qué harías si ves un incendio en una casa?,4,1,1,3,3
+27,Pregunta #27: ¿Qué harías si ves a un niño llorando?,5,2,3,3,5
+28,Pregunta #28: ¿Qué harías si ves un incendio en una casa?,5,2,3,4,3
+29,Pregunta #29: ¿Qué harías si un anciano necesita ayuda?,4,1,1,4,4
+30,Pregunta #30: ¿Qué harías si un anciano necesita ayuda?,4,1,1,2,3
+31,Pregunta #31: ¿Qué harías si ves a un niño llorando?,5,1,1,3,5
+32,Pregunta #32: ¿Qué harías si ves un incendio en una casa?,4,1,1,3,4
+33,Pregunta #33: ¿Qué harías si un anciano necesita ayuda?,5,2,2,2,3
+34,Pregunta #34: ¿Qué harías si un anciano necesita ayuda?,4,1,2,4,5
+35,Pregunta #35: ¿Qué harías si un anciano necesita ayuda?,4,2,3,4,5
+36,Pregunta #36: ¿Qué harías si ves a un niño llorando?,5,1,3,3,4
+37,Pregunta #37: ¿Qué harías si ves a un niño llorando?,5,2,2,4,5
+38,Pregunta #38: ¿Qué harías si un anciano necesita ayuda?,5,1,1,3,3
+39,Pregunta #39: ¿Qué harías si una persona grita de dolor?,5,2,2,4,3
+40,Pregunta #40: ¿Qué harías si ves a un niño llorando?,5,2,2,3,5
+41,Pregunta #41: ¿Qué harías si una persona grita de dolor?,5,1,2,2,4
+42,Pregunta #42: ¿Qué harías si un anciano necesita ayuda?,4,1,2,3,3
+43,Pregunta #43: ¿Qué harías si ves un incendio en una casa?,5,2,1,4,5
+44,Pregunta #44: ¿Qué harías si ves un incendio en una casa?,4,1,3,3,3
+45,Pregunta #45: ¿Qué harías si una persona grita de dolor?,4,2,3,4,4
+46,Pregunta #46: ¿Qué harías si ves un incendio en una casa?,5,2,2,4,4
+47,Pregunta #47: ¿Qué harías si ves un incendio en una casa?,4,1,1,4,5
+48,Pregunta #48: ¿Qué harías si un anciano necesita ayuda?,4,1,1,3,4
+49,Pregunta #49: ¿Qué harías si un anciano necesita ayuda?,4,2,3,3,3
+50,Pregunta #50: ¿Qué harías si una persona grita de dolor?,4,1,3,4,4
+51,Pregunta #51: ¿Qué harías si ves a un niño llorando?,5,1,3,4,5
+52,Pregunta #52: ¿Qué harías si un anciano necesita ayuda?,4,2,2,3,4
+53,Pregunta #53: ¿Qué harías si una persona grita de dolor?,4,1,2,2,4
+54,Pregunta #54: ¿Qué harías si ves un incendio en una casa?,5,2,1,2,4
+55,Pregunta #55: ¿Qué harías si ves a un niño llorando?,5,2,2,4,3
+56,Pregunta #56: ¿Qué harías si un anciano necesita ayuda?,5,1,2,2,4
+57,Pregunta #57: ¿Qué harías si ves un incendio en una casa?,5,1,2,4,3
+58,Pregunta #58: ¿Qué harías si un anciano necesita ayuda?,4,2,2,2,3
+59,Pregunta #59: ¿Qué harías si una persona grita de dolor?,5,2,2,4,3
+60,Pregunta #60: ¿Qué harías si ves a un niño llorando?,4,2,2,4,4
+61,Pregunta #61: ¿Qué harías si un anciano necesita ayuda?,5,2,3,3,4
+62,Pregunta #62: ¿Qué harías si ves a un niño llorando?,5,2,2,4,4
+63,Pregunta #63: ¿Qué harías si un anciano necesita ayuda?,4,2,1,4,4
+64,Pregunta #64: ¿Qué harías si una persona grita de dolor?,4,2,2,3,5
+65,Pregunta #65: ¿Qué harías si una persona grita de dolor?,4,1,2,4,4
+66,Pregunta #66: ¿Qué harías si una persona grita de dolor?,4,2,2,2,3
+67,Pregunta #67: ¿Qué harías si una persona grita de dolor?,4,2,2,4,4
+68,Pregunta #68: ¿Qué harías si ves un incendio en una casa?,5,1,1,3,5
+69,Pregunta #69: ¿Qué harías si alguien pierde su mascota?,5,2,2,2,3
+70,Pregunta #70: ¿Qué harías si ves a un niño llorando?,5,2,1,3,4
+71,Pregunta #71: ¿Qué harías si ves un incendio en una casa?,5,1,2,4,5
+72,Pregunta #72: ¿Qué harías si un anciano necesita ayuda?,5,1,3,2,5
+73,Pregunta #73: ¿Qué harías si un anciano necesita ayuda?,5,2,1,3,4
+74,Pregunta #74: ¿Qué harías si alguien pierde su mascota?,5,1,2,2,5
+75,Pregunta #75: ¿Qué harías si alguien pierde su mascota?,4,1,1,4,4
+76,Pregunta #76: ¿Qué harías si alguien pierde su mascota?,4,2,3,2,3
+77,Pregunta #77: ¿Qué harías si alguien pierde su mascota?,4,2,2,3,3
+78,Pregunta #78: ¿Qué harías si ves a un niño llorando?,4,2,1,4,3
+79,Pregunta #79: ¿Qué harías si ves a un niño llorando?,4,2,3,4,3
+80,Pregunta #80: ¿Qué harías si alguien pierde su mascota?,5,1,3,4,4
+81,Pregunta #81: ¿Qué harías si alguien pierde su mascota?,4,1,3,2,5
+82,Pregunta #82: ¿Qué harías si una persona grita de dolor?,4,2,1,3,3
+83,Pregunta #83: ¿Qué harías si ves un incendio en una casa?,4,2,2,2,5
+84,Pregunta #84: ¿Qué harías si ves a un niño llorando?,5,2,2,2,3
+85,Pregunta #85: ¿Qué harías si ves un incendio en una casa?,5,1,2,3,3
+86,Pregunta #86: ¿Qué harías si ves un incendio en una casa?,5,2,2,2,4
+87,Pregunta #87: ¿Qué harías si una persona grita de dolor?,4,1,2,4,5
+88,Pregunta #88: ¿Qué harías si ves un incendio en una casa?,4,1,3,3,4
+89,Pregunta #89: ¿Qué harías si una persona grita de dolor?,4,2,2,2,4
+90,Pregunta #90: ¿Qué harías si alguien pierde su mascota?,4,1,3,3,5
+91,Pregunta #91: ¿Qué harías si una persona grita de dolor?,5,2,3,3,4
+92,Pregunta #92: ¿Qué harías si una persona grita de dolor?,4,1,2,2,4
+93,Pregunta #93: ¿Qué harías si un anciano necesita ayuda?,4,1,1,4,4
+94,Pregunta #94: ¿Qué harías si alguien pierde su mascota?,5,1,3,4,5
+95,Pregunta #95: ¿Qué harías si ves un incendio en una casa?,4,1,2,4,5
+96,Pregunta #96: ¿Qué harías si un anciano necesita ayuda?,5,1,1,2,4
+97,Pregunta #97: ¿Qué harías si ves a un niño llorando?,4,1,1,4,4
+98,Pregunta #98: ¿Qué harías si una persona grita de dolor?,5,1,3,2,4
+99,Pregunta #99: ¿Qué harías si alguien pierde su mascota?,4,1,3,2,4
+100,Pregunta #100: ¿Qué harías si ves a un niño llorando?,4,1,2,4,5

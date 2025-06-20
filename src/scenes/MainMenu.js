@@ -29,7 +29,7 @@ export default class MainMenu extends Phaser.Scene {
     const options = ['Modo Historia', 'Modo Infinito', 'Modo Agente', 'Ajustes'];
 
     // Mostrar opciones después de 5 segundos
-    this.time.delayedCall(3000, () => {
+    this.time.delayedCall(1000, () => {
       options.forEach((text, index) => {
       const menuItem = this.add.text
         (width * 0.2, height * 0.5 + index * 60, text, {

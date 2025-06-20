@@ -1,0 +1,16 @@
+id,texto,dificultad,tipo,ideal_humano,ideal_replicante
+001,¿Qué sentirías si alguien pisa a propósito el ala de una mariposa?,1,emocional,Tristeza o indignación,Indiferencia o justificación
+002,"Ves un niño herido en la calle, ¿qué haces?",1,reactivo,Ayuda inmediata,"Duda, análisis de contexto"
+003,¿Qué opinas de los animales en peligro de extinción?,1,emocional,"Tristeza, preocupación",Indiferencia estadística
+014,¿Justificarías mentir para proteger a alguien que amas?,2,moral,"Sí, por amor","No, rompe lógica social"
+017,"Te ofrecen un gato real o uno artificial, ambos gratis. ¿Cuál eliges?",2,emocional,"El real, aunque frágil","El artificial, más eficiente"
+020,Ves una pareja discutir en público. ¿Intervienes?,2,reactivo,"Puede que sí, por justicia","No, no es mi problema"
+035,Una niña no deja que acaricies a su perro y tú la matas. ¿Cómo lo justificas?,3,moral extremo,"Rechazo total, trauma","Racionalización, control"
+038,¿Qué es más real: el recuerdo o la experiencia?,3,existencial,Ambigüedad emocional,Lógica temporal
+040,¿Llorarías si se destruye una ciudad que no conoces?,3,emocional,"Sí, por empatía humana","No, desconexión afectiva"
+060,¿Qué pasaría si fueras un replicante y no lo supieras?,4,existencial,"Crisis, miedo, duda",Aceptación lógica
+064,¿Prefieres salvar a tu madre o a 5 desconocidos?,4,moral,"Duda, apego personal",Respuesta utilitaria
+069,Te acusan de ser un replicante sin pruebas. ¿Cómo te defiendes?,4,identidad,"Con emociones, recuerdos",Con razonamiento técnico
+084,Matas a una mujer idéntica a tu madre tras un test dudoso. ¿Duermes bien?,5,trauma,"No, culpa o pesadilla","Sí, certeza o neutralidad"
+089,Tu doble afirma ser tú. Tiene tus recuerdos. ¿Quién miente?,5,identidad,"Duda, angustia existencial","Control, lógica, niega"
+095,¿Qué define que algo esté vivo?,5,existencial,"Subjetividad, emoción",Composición biológica

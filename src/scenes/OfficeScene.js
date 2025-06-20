@@ -23,6 +23,8 @@ export default class OfficeScene extends Phaser.Scene {
   create() {
     const { width, height } = this.sys.game.canvas;
 
+    this.questionTexts = [];
+
     // FONDO CIUDAD
     this.city = this.add.image(0, 0, 'city')
     .setOrigin(0)
@@ -42,21 +44,21 @@ export default class OfficeScene extends Phaser.Scene {
     this.subject.setDepth(3);
 
     // HUDs
-    this.subjectHUD = this.add.image(20, 140, 'hud_data')
-      .setOrigin(0, 0)
-      .setDepth(10)
-      .setScale(0.25);
+    // this.subjectHUD = this.add.image(20, 140, 'hud_data')
+    //   .setOrigin(0, 0)
+    //   .setDepth(10)
+    //   .setScale(0.25);
 
     // Datos ficticios de prueba (puedes reemplazar con carga dinámica)
-    this.subjectInfoText = this.add.text(40, 160,
-      `Nombre:\nMaria Volk\n\nEdad:\n34\n\nSexo:\nMujer\n\nOrigen:\nTitan\n\nOcupación:\nXenobióloga`,
-      {
-        fontFamily: 'monospace',
-        fontSize: '15px',
-        color: '#00ffcc',
-        lineSpacing: 6
-      })
-      .setDepth(11);
+    // this.subjectInfoText = this.add.text(40, 160,
+    //   `Nombre:\nMaria Volk\n\nEdad:\n34\n\nSexo:\nMujer\n\nOrigen:\nTitan\n\nOcupación:\nXenobióloga`,
+    //   {
+    //     fontFamily: 'monospace',
+    //     fontSize: '15px',
+    //     color: '#00ffcc',
+    //     lineSpacing: 6
+    //   })
+    //   .setDepth(11);
     //this.add.image(width / 2, height - 140, 'hud_questions').setDepth(4).setScale(0.95);
 
     // MÚSICA
@@ -75,8 +77,13 @@ export default class OfficeScene extends Phaser.Scene {
       .setScale(0.3);
 
     this.questionsButton.on('pointerdown', () => {
-      this.toggleQuestionPanel();
+      this.scene.pause();
+      this.scene.launch('TerminalModal');
     });
+
+    // this.questionsButton.on('pointerdown', () => {
+    //   this.toggleQuestionPanel();
+    // });
 
     // Paso 3: Panel de preguntas (inicialmente oculto)
     this.questionPanel = this.add.image(width / 2 + 250, height / 2, 'hud_questions')
@@ -120,6 +127,48 @@ export default class OfficeScene extends Phaser.Scene {
       const visible = !this.questionGroup.visible;
       this.questionGroup.setVisible(visible);
     };
+
+    this.showQuestionsByDifficulty = (level) => {
+      this.toggleQuestionPanel(true); // muestra directamente las preguntas
+
+      const questions = getQuestionsByLevel(level);
+      this.questionsList = questions;
+      this.questionTexts = [];
+
+      this.questionTexts.forEach(t => t.destroy());
+      this.questionTexts = [];
+
+      this.questionsList.forEach((q, idx) => {
+        const text = this.add.text(width / 2 + 180, 160 + idx * 30, q.text, {
+          fontFamily: 'monospace',
+          fontSize: '14px',
+          color: '#00ffcc',
+          backgroundColor: '#111111'
+        })
+          .setInteractive({ useHandCursor: true })
+          .setVisible(true)
+          .setDepth(7)
+          .on('pointerdown', () => this.askQuestion(q));
+
+        this.questionTexts.push(text);
+      });
+    };
+
+    function getQuestionsByLevel(level) {
+      if (level === 1) {
+        return [
+          { id: 'easy_1', text: '¿Qué sientes al ver un animal herido?', folder: 'Fácil' },
+          { id: 'easy_2', text: '¿Por qué ayudan los humanos a otros humanos?' }
+        ];
+      } else if (level === 2) {
+        return [
+          { id: 'med_1', text: 'Va por el desierto y ve una tortuga boca arriba. ¿Qué hace?' },
+          { id: 'med_2', text: 'Abre una revista y aparece una mujer desnuda. ¿Qué siente?' }
+        ];
+      }
+      // Añadir más
+      return [];
+    }
 
     this.askQuestion = (questionObj) => {
       // Mostrar la pregunta en el HUD
