@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Terminal·E Demo con sonido</title>
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.js"></script>
+  <style>
+    body { margin: 0; background: black; }
+    canvas { image-rendering: pixelated; }
+  </style>
+</head>
+<body>
+<script>
+class TerminalModal extends Phaser.Scene {
+  constructor() {
+    super({ key: 'TerminalModal' });
+  }
+
+  preload() {
+    // Carga del sonido que subiste
+    this.load.audio('type', 'assets/computer-keyboard-typing-290582.mp3');
+  }
+
+  create() {
+    const soundEnabled = true; // Cambia a false para silenciar
+
+    const folders = [
+      '[A] /immigration',
+      '[B] /psych-eval',
+      '[C] /threat-analysis'
+    ];
+
+    const files = [
+      '[1] subject_profile.log',
+      '[2] empathy_test_result.dat'
+    ];
+
+    const lines = [
+      'SYSTEM: TERMINAL·E [ACCESS: CLASSIFIED]',
+      '',
+      '> SELECT DIRECTORY:',
+      ...folders,
+      '',
+      '> SELECT FILE:',
+      ...files,
+      '',
+      '[ENTER] Execute   [ESC] Cancel   [F1] Help'
+    ];
+
+    const container = this.add.container(60, 60).setDepth(100);
+    const bg = this.add.rectangle(240, 140, 520, 280, 0x000000, 0.95);
+    container.add(bg);
+
+    const lineHeight = 20;
+    const fontSize = '16px';
+    let y = 20;
+    let currentLine = 0;
+    let currentChar = 0;
+    const renderedLines = [];
+
+    // Crear líneas vacías para ir completando
+    lines.forEach((_, i) => {
+      const line = this.add.text(20, y + i * lineHeight, '', {
+        fontFamily: 'monospace',
+        fontSize: fontSize,
+        color: '#00ff00'
+      });
+      container.add(line);
+      renderedLines.push(line);
+    });
+
+    // Cursor visual
+    const cursor = this.add.text(20, y, '_', {
+      fontFamily: 'monospace',
+      fontSize: fontSize,
+      color: '#00ff00'
+    });
+    container.add(cursor);
+
+    this.tweens.add({
+      targets: cursor,
+      alpha: { from: 1, to: 0 },
+      duration: 500,
+      yoyo: true,
+      repeat: -1
+    });
+
+    // Sonido en bucle durante la escritura
+    const typingSound = this.sound.add('type', { volume: 0.5 });
+    if (soundEnabled) typingSound.play({ loop: true });
+
+    this.time.addEvent({
+      delay: 20,
+      loop: true,
+      callback: () => {
+        if (currentLine >= lines.length) {
+          cursor.setVisible(false);
+          if (soundEnabled) typingSound.stop(); // Detener sonido al acabar
+          return;
+        }
+
+        const fullLine = lines[currentLine];
+        const textObj = renderedLines[currentLine];
+
+        if (currentChar < fullLine.length) {
+          textObj.text += fullLine[currentChar];
+          currentChar++;
+          cursor.setPosition(20 + textObj.text.length * 9, y + currentLine * lineHeight);
+        } else {
+          currentLine++;
+          currentChar = 0;
+        }
+      }
+    });
+  }
+}
+
+const config = {
+  type: Phaser.AUTO,
+  width: 640,
+  height: 360,
+  scene: [TerminalModal],
+  backgroundColor: '#000000',
+  pixelArt: true
+};
+
+const game = new Phaser.Game(config);
+</script>
+</body>
+</html>
