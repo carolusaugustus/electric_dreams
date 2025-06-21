@@ -33,8 +33,9 @@ export default class MainMenu extends Phaser.Scene {
       options.forEach((text, index) => {
       const menuItem = this.add.text
         (width * 0.2, height * 0.5 + index * 60, text, {
-        fontFamily: 'VT323',
-        fontSize: '32px',
+        // fontFamily: 'VT323',
+        fontFamily: 'monospace',
+        fontSize: '28px',
         color: '#00FF00'
       })
       .setAlpha(0)
