@@ -82,13 +82,13 @@ function parseCSV(csvText) {
 
   for (let i = 1; i < lines.length; i++) {
     const row = parseCSVRow(lines[i]);
-    console.log(row); // Depuración: muestra cada fila procesada
+    //console.log(row); // Depuración: muestra cada fila procesada
     if (!row || row.length < 6) continue; // seguridad básica
 
     const pregunta = row[1].trim();
     const dificultad = row[5].trim(); // El campo 5 es la dificultad
-    console.log(dificultad); // Depuración: muestra la dificultad
-    console.log(pregunta)
+    //console.log(dificultad); // Depuración: muestra la dificultad
+    //console.log(pregunta)
     if (pregunta && ['1', '2', '3', '4'].includes(dificultad)) {
       preguntasPorDificultad[dificultad].push(pregunta);
     }else {
