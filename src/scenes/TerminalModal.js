@@ -328,14 +328,52 @@ export default class TerminalModal extends Phaser.Scene {
   }
 
   setupMainMenuInput() {
-    this.keyboardHandler.addGeneralListener((event) => {
-      const preguntasPorDificultad = this.registry.get('preguntasPorDificultad');
-      const preguntas = preguntasPorDificultad?.[event.key];
+    // Configurar listeners de teclado para opciones 1-4
+    ['1', '2', '3', '4'].forEach(key => {
+      this.keyboardHandler.addListener(key, () => {
+        this.selectMainMenuOption(key);
+      });
+    });
 
-      if (preguntas?.length > 0) {
-        this.showQuestionsMenu(preguntas, event.key);
-      } else if (event.key === 'Escape') {
-        this.exitTerminal();
+    // Listener para ESC
+    this.keyboardHandler.addListener('ESC', () => {
+      this.exitTerminal();
+    });
+
+    // Hacer las opciones clicables
+    this.makeMainMenuOptionsClickable();
+  }
+
+  selectMainMenuOption(selectedKey) {
+    const preguntasPorDificultad = this.registry.get('preguntasPorDificultad');
+    const preguntas = preguntasPorDificultad?.[selectedKey];
+
+    if (preguntas?.length > 0) {
+      const difficultyNames = { '1': 'Fácil', '2': 'Medio', '3': 'Difícil', '4': 'Extremo' };
+      this.showQuestionsMenu(preguntas, difficultyNames[selectedKey] || selectedKey);
+    }
+  }
+
+  makeMainMenuOptionsClickable() {
+    // Buscar las líneas que contienen las opciones del menú (índices 3-6 en MAIN_MENU_LINES)
+    const optionIndices = [3, 4, 5, 6]; // [1] Fácil, [2] Medio, [3] Difícil, [4] Extremo
+    
+    this.container.list.forEach((child, index) => {
+      if (child.type === 'Text' && optionIndices.includes(index - 2)) { // Ajustar por bg y cursor
+        const optionNumber = (index - 2 - 2).toString(); // Calcular número de opción (1-4)
+        if (['1', '2', '3', '4'].includes(optionNumber)) {
+          child.setInteractive();
+          child.on('pointerdown', () => {
+            this.selectMainMenuOption(optionNumber);
+          });
+          // Agregar efecto hover
+          child.on('pointerover', () => {
+            child.setTint(0x00aa00);
+          });
+          child.on('pointerout', () => {
+            child.clearTint();
+          });
+        }
       }
     });
   }
@@ -347,8 +385,10 @@ export default class TerminalModal extends Phaser.Scene {
       currentPage: 0
     });
     
+    // Limpiar listeners del menú principal antes de mostrar preguntas
+    this.keyboardHandler.removeAllListeners();
+    
     this.renderQuestionsPage();
-    this.setupQuestionsInput();
   }
 
   renderQuestionsPage() {
@@ -361,10 +401,16 @@ export default class TerminalModal extends Phaser.Scene {
     
     this.renderer.clearContent([this.bg, this.cursor]);
     
+    // Importante: limpiar listeners anteriores antes de renderizar nueva página
+    this.keyboardHandler.removeAllListeners();
+    
     const renderedLines = this.typingEffect.typeLines(
       lines,
       this.cursor,
-      () => this.makeQuestionsInteractive(pageQuestions, renderedLines),
+      () => {
+        this.makeQuestionsInteractive(pageQuestions, renderedLines);
+        this.setupQuestionsInput(); // Configurar input después de completar el typing
+      },
       TERMINAL_CONFIG.FAST_TYPING_DELAY
     );
   }
@@ -373,6 +419,17 @@ export default class TerminalModal extends Phaser.Scene {
     const { currentPage } = this.state;
     const startNumber = currentPage * TERMINAL_CONFIG.PAGE_SIZE + 1;
     
+    const navigationInfo = [];
+    if (this.canGoToPreviousPage() || this.canGoToNextPage()) {
+      const navOptions = [];
+      if (this.canGoToNextPage()) navOptions.push('[N] Siguiente');
+      if (this.canGoToPreviousPage()) navOptions.push('[P] Anterior');
+      navOptions.push('[ESC] Menú Principal');
+      navigationInfo.push(navOptions.join('  '));
+    } else {
+      navigationInfo.push('[ESC] Menú Principal');
+    }
+    
     return [
       '',
       `> DIFICULTAD: ${difficulty.toUpperCase()} — ${totalQuestions} preguntas`,
@@ -380,7 +437,7 @@ export default class TerminalModal extends Phaser.Scene {
       '> SELECCIONA UNA PREGUNTA:',
       ...pageQuestions.map((q, i) => `[${startNumber + i}] ${q.pregunta}`),
       '',
-      '[N] Siguiente  [P] Anterior  [ESC] Cancelar'
+      ...navigationInfo
     ];
   }
 
@@ -395,13 +452,19 @@ export default class TerminalModal extends Phaser.Scene {
           this.exitTerminal();
           this.scene.get('OfficeScene').launchQuestion(question);
         });
+        // Agregar efecto hover para las preguntas
+        line.on('pointerover', () => {
+          line.setTint(0x00aa00);
+        });
+        line.on('pointerout', () => {
+          line.clearTint();
+        });
       }
     });
   }
 
   setupQuestionsInput() {
-    this.keyboardHandler.removeAllListeners();
-    
+    // Configurar navegación por páginas
     this.keyboardHandler.addListener('N', () => {
       if (this.canGoToNextPage()) {
         this.state.currentPage++;
@@ -416,8 +479,22 @@ export default class TerminalModal extends Phaser.Scene {
       }
     });
     
+    // Permitir regresar al menú principal con ESC
     this.keyboardHandler.addListener('ESC', () => {
-      this.exitTerminal();
+      this.showMainMenu();
+    });
+
+    // También permitir selección numérica de preguntas
+    const { currentQuestions, currentPage } = this.state;
+    const startIndex = currentPage * TERMINAL_CONFIG.PAGE_SIZE;
+    const pageQuestions = currentQuestions.slice(startIndex, startIndex + TERMINAL_CONFIG.PAGE_SIZE);
+    
+    pageQuestions.forEach((question, i) => {
+      const questionNumber = (i + 1).toString();
+      this.keyboardHandler.addListener(questionNumber, () => {
+        this.exitTerminal();
+        this.scene.get('OfficeScene').launchQuestion(question);
+      });
     });
   }
 
