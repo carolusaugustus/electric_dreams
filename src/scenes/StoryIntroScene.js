@@ -84,15 +84,17 @@ function parseCSV(csvText) {
     const row = parseCSVRow(lines[i]);
     //console.log(row); // Depuración: muestra cada fila procesada
     if (!row || row.length < 6) continue; // seguridad básica
-
-    const pregunta = row[1].trim();
-    const dificultad = row[5].trim(); // El campo 5 es la dificultad
-    //console.log(dificultad); // Depuración: muestra la dificultad
-    //console.log(pregunta)
-    if (pregunta && ['1', '2', '3', '4'].includes(dificultad)) {
-      preguntasPorDificultad[dificultad].push(pregunta);
+    const json = {};
+    for (let j = 0; j < headers.length; j++) {
+      var key = headers[j].trim().toLowerCase();
+      const value = row[j] ? row[j].trim() : '';
+      json[key] = value;
+    }
+    
+    if (json!=null && ['1', '2', '3', '4'].includes(json.nivel)) {
+      preguntasPorDificultad[json.nivel].push(json);
     }else {
-      console.warn(`Pregunta inválida o dificultad no soportada: ${pregunta} (Dificultad: ${dificultad})`);
+      console.warn(`Pregunta inválida o dificultad no soportada: ${json.nivel} (Dificultad: ${dificultad})`);
     }
   }
   console.log(preguntasPorDificultad); // Depuración: muestra el objeto final

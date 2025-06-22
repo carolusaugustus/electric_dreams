@@ -139,7 +139,7 @@ export default class TerminalModal extends Phaser.Scene {
           `> DIFICULTAD: ${dificultad.toUpperCase()} — ${preguntas.length} preguntas`,
           '',
           '> SELECCIONA UNA PREGUNTA:',
-          ...pageQuestions.map((q, i) => `[${(currentPage * pageSize) + i + 1}] ${q}`),
+          ...pageQuestions.map((q, i) => `[${(currentPage * pageSize) + i + 1}] ${q.pregunta}`),
           '',
           '[N] Siguiente  [P] Anterior  [ESC] Cancelar'
         ];
@@ -212,6 +212,7 @@ export default class TerminalModal extends Phaser.Scene {
       this.input.keyboard.off('keydown-ESC', escKeyListener);
 
       nKeyListener = this.input.keyboard.on('keydown-N', () => {
+        console.log(`Current page: ${currentPage}, Page size: ${pageSize}, Total preguntas: ${preguntas.length}`);
         if ((currentPage + 1) * pageSize < preguntas.length) {
           currentPage++;
           renderPage();
