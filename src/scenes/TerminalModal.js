@@ -170,7 +170,7 @@ export default class TerminalModal extends Phaser.Scene {
         }
 
         this.typingEvent = this.time.addEvent({
-          delay: 25,
+          delay: 5,
           loop: true,
           callback: () => {
             if (currentRenderLineIndex >= fullLines.length) {
