@@ -1,385 +1,129 @@
-export default class TerminalModal extends Phaser.Scene {
-  constructor() {
-    super({ key: 'TerminalModal' });
-    this.bg = null; // Declarar bg aquí para que sea accesible en todo el scope de la clase
-    this.cursor = null; // Declarar cursor aquí también
-    this.typingSound = null; // Declarar typingSound para poder detenerlo globalmente si es necesario
-    this.typingEvent = null; // Para controlar el evento de escritura
+// TerminalConfig.js - Configuración centralizada
+export const TERMINAL_CONFIG = {
+  TYPING_DELAY: 25,
+  FAST_TYPING_DELAY: 5,
+  LINE_HEIGHT: 22,
+  FONT_SIZE: '16px',
+  FONT_FAMILY: 'monospace',
+  COLOR: '#00ff00',
+  BACKGROUND_COLOR: 0x000000,
+  BACKGROUND_ALPHA: 0.95,
+  SOUND_VOLUME: 0.3,
+  PAGE_SIZE: 10,
+  CURSOR_BLINK_DURATION: 500,
+  TEXT_PADDING: 20,
+  CHAR_WIDTH: 9
+};
+
+export const MENU_DATA = {
+  CATEGORIES: [
+    { key: '1', label: '[1] Fácil', difficulty: '1' },
+    { key: '2', label: '[2] Medio', difficulty: '2' },
+    { key: '3', label: '[3] Difícil', difficulty: '3' },
+    { key: '4', label: '[4] Extremo', difficulty: '4' }
+  ],
+  MAIN_MENU_LINES: [
+    'ACCESSING TERMINAL·E INTERFACE...',
+    '',
+    '> CATEGORÍAS DISPONIBLES:',
+    '[1] Fácil',
+    '[2] Medio',
+    '[3] Difícil',
+    '[4] Extremo',
+    '',
+    '[Pulsa número para continuar]'
+  ]
+};
+
+// TerminalRenderer.js - Manejo de renderizado
+export class TerminalRenderer {
+  constructor(scene, container) {
+    this.scene = scene;
+    this.container = container;
+    this.config = TERMINAL_CONFIG;
   }
 
-  preload() {
-    this.load.audio('type', 'assets/computer-keyboard-typing-290582.mp3');
+  createTextLine(text, x, y, addToContainer = true) {
+    const textObj = this.scene.add.text(x, y, text, {
+      fontFamily: this.config.FONT_FAMILY,
+      fontSize: this.config.FONT_SIZE,
+      color: this.config.COLOR
+    });
+    
+    if (addToContainer) {
+      this.container.add(textObj);
+    }
+    
+    return textObj;
   }
 
-  create() {
-    const soundEnabled = true;
-    const { width, height } = this.sys.game.canvas;
-
-    const folders = [
-      '[1] Fácil',
-      '[2] Medio',
-      '[3] Difícil',
-      '[4] Extremo'
-    ];
-
-    const lines = [
-      'ACCESSING TERMINAL·E INTERFACE...',
-      '',
-      '> CATEGORÍAS DISPONIBLES:',
-      ...folders,
-      '',
-      '[Pulsa número para continuar]'
-    ];
-
-    // const container = this.add.container(width / 2 - 250, height / 2 - 140).setDepth(100);
-    const container = this.add.container(0, 0).setDepth(100);
-    // this.bg = this.add.rectangle(250, 140, 520, 280, 0x000000, 0.95);
-    this.bg = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.95);
-    container.add(this.bg); // Añadir bg al container
-
-    const lineHeight = 22;
-    const fontSize = '16px';
-    let y = 20;
-    let currentLine = 0;
-    let currentChar = 0;
-    const renderedLines = [];
-
-    // Llenar renderedLines con objetos de texto vacíos al principio
-    lines.forEach((_, i) => {
-      const line = this.add.text(20, y + i * lineHeight, '', {
-        fontFamily: 'monospace',
-        fontSize,
-        color: '#00ff00'
-      });
-      container.add(line);
-      renderedLines.push(line);
-    });
-
-    this.cursor = this.add.text(20, y, '_', {
-      fontFamily: 'monospace',
-      fontSize,
-      color: '#00ff00'
-    });
-    container.add(this.cursor);
-
-    this.tweens.add({
-      targets: this.cursor,
+  createCursor(x, y) {
+    const cursor = this.createTextLine('_', x, y);
+    
+    this.scene.tweens.add({
+      targets: cursor,
       alpha: { from: 1, to: 0 },
-      duration: 500,
+      duration: this.config.CURSOR_BLINK_DURATION,
       yoyo: true,
       repeat: -1
     });
+    
+    return cursor;
+  }
 
-    this.typingSound = this.sound.add('type', { volume: 0.3 });
-    if (soundEnabled) this.typingSound.play({ loop: true });
-
-    // Función para manejar el cierre del terminal y la reanudación de la OfficeScene
-    const exitTerminal = () => {
-      if (this.typingSound && this.typingSound.isPlaying) {
-        this.typingSound.stop();
+  clearContent(keepElements = []) {
+    this.container.list.forEach(child => {
+      if (!keepElements.includes(child)) {
+        child.destroy();
       }
-      if (this.typingEvent) {
-        this.typingEvent.remove(false);
-        this.typingEvent = null;
-      }
-      // Limpiar todos los listeners de teclado al salir
-      this.input.keyboard.removeAllListeners();
-
-      this.scene.stop('TerminalModal'); // Detener solo esta escena
-      this.scene.resume('OfficeScene'); // Reanudar la OfficeScene
-    };
-
-    const showQuestionsTerminal = (preguntas, dificultad) => {
-      // Remover solo los elementos de texto de las preguntas anteriores, NO el fondo ni el cursor.
-      // Se eliminan todos los hijos del contenedor excepto el fondo y el cursor.
-      container.list.forEach(child => {
-        if (child !== this.bg && child !== this.cursor) {
-          child.destroy();
-        }
-      });
-      // Asegurarse de que el fondo está en el contenedor y es el primer elemento
-      if (!container.list.includes(this.bg)) {
-        container.addAt(this.bg, 0);
-      }
-      // Asegurarse de que el cursor esté en el contenedor
-      if (!container.list.includes(this.cursor)) {
-        container.add(this.cursor);
-      }
-
-
-      const pageSize = 10;
-      let currentPage = 0;
-
-      // Variables para los listeners de teclado específicos de esta vista
-      let nKeyListener, pKeyListener, escKeyListener;
-
-      const renderPage = () => {
-        // Remover solo los elementos de texto de las preguntas, manteniendo el fondo y el cursor
-        container.list.forEach(child => {
-          if (child !== this.bg && child !== this.cursor) {
-            child.destroy();
-          }
-        });
-
-        // Asegurarse de que el fondo está en el contenedor y es el primer elemento
-        if (!container.list.includes(this.bg)) {
-            container.addAt(this.bg, 0);
-        }
-        // Asegurarse de que el cursor esté en el contenedor y se muestre encima
-        if (!container.list.includes(this.cursor)) {
-            container.add(this.cursor);
-        }
-        this.cursor.setVisible(true);
-        container.bringToTop(this.cursor);
-
-
-        const pageQuestions = preguntas.slice(currentPage * pageSize, (currentPage + 1) * pageSize);
-        const fullLines = [
-          '',
-          `> DIFICULTAD: ${dificultad.toUpperCase()} — ${preguntas.length} preguntas`,
-          '',
-          '> SELECCIONA UNA PREGUNTA:',
-          ...pageQuestions.map((q, i) => `[${(currentPage * pageSize) + i + 1}] ${q.pregunta}`),
-          '',
-          '[N] Siguiente  [P] Anterior  [ESC] Cancelar'
-        ];
-
-        const newRenderedLines = []; // Usar un nuevo array para las líneas de la página actual
-        let yOffset = 20;
-        let currentRenderLineIndex = 0;
-        let currentRenderCharIndex = 0;
-
-        fullLines.forEach((_, i) => {
-          const line = this.add.text(20, yOffset + i * lineHeight, '', {
-            fontFamily: 'monospace',
-            fontSize,
-            color: '#00ff00'
-          });
-          container.add(line);
-          newRenderedLines.push(line);
-        });
-
-        this.cursor.setPosition(20, yOffset);
-
-        if (soundEnabled && !this.typingSound.isPlaying) {
-          this.typingSound.play({ loop: true });
-        }
-
-        if (this.typingEvent) {
-          this.typingEvent.remove(false);
-        }
-
-        this.typingEvent = this.time.addEvent({
-          delay: 5,
-          loop: true,
-          callback: () => {
-            if (currentRenderLineIndex >= fullLines.length) {
-              this.cursor.setVisible(false);
-              this.typingSound.stop();
-              this.typingEvent = null; // Limpiar la referencia al evento
-
-              pageQuestions.forEach((q, i) => {
-                const line = newRenderedLines[i + 4]; // Ajustar índice para las preguntas
-                if (line) { // Asegurarse de que la línea existe
-                  line.setInteractive();
-                  line.on('pointerdown', () => {
-                    exitTerminal();
-                    this.scene.get('OfficeScene').launchQuestion(q);
-                  });
-                }
-              });
-              return;
-            }
-
-            const fullLine = fullLines[currentRenderLineIndex];
-            const textObj = newRenderedLines[currentRenderLineIndex];
-
-            if (currentRenderCharIndex < fullLine.length) {
-              textObj.text += fullLine[currentRenderCharIndex];
-              currentRenderCharIndex++;
-              this.cursor.setPosition(20 + textObj.text.length * 9, yOffset + currentRenderLineIndex * lineHeight);
-            } else {
-              currentRenderLineIndex++;
-              currentRenderCharIndex = 0;
-            }
-          }
-        });
-      };
-
-      // Limpiar listeners previos de N, P, ESC antes de añadir nuevos para la paginación
-      this.input.keyboard.off('keydown-N', nKeyListener);
-      this.input.keyboard.off('keydown-P', pKeyListener);
-      this.input.keyboard.off('keydown-ESC', escKeyListener);
-
-      nKeyListener = this.input.keyboard.on('keydown-N', () => {
-        console.log(`Current page: ${currentPage}, Page size: ${pageSize}, Total preguntas: ${preguntas.length}`);
-        if ((currentPage + 1) * pageSize < preguntas.length) {
-          currentPage++;
-          renderPage();
-        }
-      });
-
-      pKeyListener = this.input.keyboard.on('keydown-P', () => {
-        if (currentPage > 0) {
-          currentPage--;
-          renderPage();
-        }
-      });
-
-      escKeyListener = this.input.keyboard.on('keydown-ESC', () => {
-        exitTerminal();
-      });
-
-      renderPage();
-    };
-
-    // Almacenar el listener de teclado del menú principal para poder desactivarlo
-    let mainKeyListener;
-
-    this.typingEvent = this.time.addEvent({ // Usar this.typingEvent para el evento de typing inicial
-      delay: 25,
-      loop: true,
-      callback: () => {
-        if (currentLine >= lines.length) {
-          this.cursor.setVisible(false);
-          this.typingSound.stop();
-          this.typingEvent = null; // Limpiar la referencia al evento cuando termina
-
-          if (!mainKeyListener) {
-            mainKeyListener = this.input.keyboard.on('keydown', (event) => {
-              const preguntasPorDificultad = this.registry.get('preguntasPorDificultad');
-              const preguntas = preguntasPorDificultad ? preguntasPorDificultad[event.key] : null;
-
-              if (preguntas && preguntas.length > 0) {
-                this.input.keyboard.off('keydown', mainKeyListener); // Desactivar el listener principal
-                showQuestionsTerminal(preguntas, event.key);
-              } else if (event.key === 'Escape') { // Permitir salir con ESC desde el menú principal
-                 exitTerminal();
-              }
-            });
-          }
-          return;
-        }
-
-        const fullLine = lines[currentLine];
-        const textObj = renderedLines[currentLine];
-
-        if (currentChar < fullLine.length) {
-          textObj.text += fullLine[currentChar];
-          currentChar++;
-          this.cursor.setPosition(20 + textObj.text.length * 9, y + currentLine * lineHeight);
-        } else {
-          currentLine++;
-          currentChar = 0;
-        }
-      }
-    });
-
-    // Pausar la OfficeScene cuando TerminalModal se lanza
-    this.events.on('wake', () => {
-        this.scene.pause('OfficeScene');
-        // Asegurarse de que el modal se inicialice correctamente al ser reanudado/lanzado
-        this.container.setVisible(true); // Hacer visible el contenedor principal
-        this.bg.setVisible(true); // Hacer visible el fondo
-        this.cursor.setVisible(true); // Hacer visible el cursor
-        // Reiniciar la secuencia de escritura del menú principal
-        this.typingSound.play({ loop: true });
-        this.showMainMenu(); // Una nueva función para mostrar el menú principal
     });
   }
 
-  // Nueva función para re-renderizar el menú principal
-  showMainMenu() {
-    const { width, height } = this.sys.game.canvas;
-    const container = this.children.getByName('mainContainer'); // Asumiendo que le pones un nombre al container
+  updateCursorPosition(textObj, lineIndex) {
+    const x = this.config.TEXT_PADDING + textObj.text.length * this.config.CHAR_WIDTH;
+    const y = this.config.TEXT_PADDING + lineIndex * this.config.LINE_HEIGHT;
+    return { x, y };
+  }
+}
 
-    // Si el contenedor no existe, crea uno nuevo (o asegúrate de que exista y lo rellenas)
-    if (!container) {
-      // Re-crear o re-inicializar el contenedor y sus elementos si es necesario
-      // Por simplicidad, aquí asumimos que el container ya existe desde create()
-      // y solo necesitamos limpiarlo y rellenarlo con las líneas del menú principal.
+// TerminalTypingEffect.js - Efecto de escritura
+export class TerminalTypingEffect {
+  constructor(scene, renderer, soundManager) {
+    this.scene = scene;
+    this.renderer = renderer;
+    this.soundManager = soundManager;
+    this.typingEvent = null;
+    this.isTyping = false;
+  }
+
+  typeLines(lines, cursor, onComplete, delay = TERMINAL_CONFIG.TYPING_DELAY) {
+    if (this.isTyping) {
+      this.stop();
     }
 
-    container.list.forEach(child => {
-        if (child !== this.bg && child !== this.cursor) {
-            child.destroy();
-        }
-    });
-
-    const folders = [
-      '[1] Fácil',
-      '[2] Medio',
-      '[3] Difícil',
-      '[4] Extremo'
-    ];
-
-    const lines = [
-      'ACCESSING TERMINAL·E INTERFACE...',
-      '',
-      '> CATEGORÍAS DISPONIBLES:',
-      ...folders,
-      '',
-      '[Pulsa número para continuar]'
-    ];
-
-    const lineHeight = 22;
-    const fontSize = '16px';
-    let y = 20;
     let currentLine = 0;
     let currentChar = 0;
     const renderedLines = [];
 
+    // Crear líneas vacías
     lines.forEach((_, i) => {
-      const line = this.add.text(20, y + i * lineHeight, '', {
-        fontFamily: 'monospace',
-        fontSize,
-        color: '#00ff00'
-      });
-      container.add(line);
+      const y = TERMINAL_CONFIG.TEXT_PADDING + i * TERMINAL_CONFIG.LINE_HEIGHT;
+      const line = this.renderer.createTextLine('', TERMINAL_CONFIG.TEXT_PADDING, y);
       renderedLines.push(line);
     });
 
-    this.cursor.setPosition(20, y);
-    this.cursor.setVisible(true);
-    container.bringToTop(this.cursor);
+    cursor.setPosition(TERMINAL_CONFIG.TEXT_PADDING, TERMINAL_CONFIG.TEXT_PADDING);
+    cursor.setVisible(true);
+    
+    this.soundManager.startTyping();
+    this.isTyping = true;
 
-
-    if (this.typingEvent) {
-      this.typingEvent.remove(false);
-    }
-
-    // Reestablecer los listeners del teclado del menú principal
-    this.input.keyboard.removeAllListeners(); // Eliminar todos los listeners anteriores para evitar duplicados
-    let mainKeyListener = this.input.keyboard.on('keydown', (event) => {
-        const preguntasPorDificultad = this.registry.get('preguntasPorDificultad');
-        const preguntas = preguntasPorDificultad ? preguntasPorDificultad[event.key] : null;
-
-        if (preguntas && preguntas.length > 0) {
-            this.input.keyboard.off('keydown', mainKeyListener);
-            this.typingSound.stop(); // Detener el sonido de typing al cambiar de vista
-            this.typingEvent.remove(false); // Detener el evento de typing
-            this.typingEvent = null;
-            this.cursor.setVisible(false); // Ocultar cursor
-            showQuestionsTerminal(preguntas, event.key);
-        } else if (event.key === 'Escape') {
-            this.typingSound.stop();
-            this.typingEvent.remove(false);
-            this.typingEvent = null;
-            this.cursor.setVisible(false);
-            this.scene.stop('TerminalModal');
-            this.scene.resume('OfficeScene');
-        }
-    });
-
-
-    this.typingEvent = this.time.addEvent({
-      delay: 25,
+    this.typingEvent = this.scene.time.addEvent({
+      delay,
       loop: true,
       callback: () => {
         if (currentLine >= lines.length) {
-          this.cursor.setVisible(false);
-          this.typingSound.stop();
-          this.typingEvent = null;
+          this.complete(cursor, onComplete);
           return;
         }
 
@@ -389,12 +133,329 @@ export default class TerminalModal extends Phaser.Scene {
         if (currentChar < fullLine.length) {
           textObj.text += fullLine[currentChar];
           currentChar++;
-          this.cursor.setPosition(20 + textObj.text.length * 9, y + currentLine * lineHeight);
+          const cursorPos = this.renderer.updateCursorPosition(textObj, currentLine);
+          cursor.setPosition(cursorPos.x, cursorPos.y);
         } else {
           currentLine++;
           currentChar = 0;
         }
       }
     });
+
+    return renderedLines;
+  }
+
+  complete(cursor, onComplete) {
+    cursor.setVisible(false);
+    this.soundManager.stopTyping();
+    this.stop();
+    if (onComplete) onComplete();
+  }
+
+  stop() {
+    if (this.typingEvent) {
+      this.typingEvent.remove(false);
+      this.typingEvent = null;
+    }
+    this.isTyping = false;
+  }
+}
+
+// TerminalSoundManager.js - Manejo de sonidos
+export class TerminalSoundManager {
+  constructor(scene) {
+    this.scene = scene;
+    this.typingSound = null;
+    this.soundEnabled = true;
+  }
+
+  preload() {
+    this.scene.load.audio('type', 'assets/computer-keyboard-typing-290582.mp3');
+  }
+
+  init() {
+    this.typingSound = this.scene.sound.add('type', { 
+      volume: TERMINAL_CONFIG.SOUND_VOLUME 
+    });
+  }
+
+  startTyping() {
+    if (this.soundEnabled && this.typingSound && !this.typingSound.isPlaying) {
+      this.typingSound.play({ loop: true });
+    }
+  }
+
+  stopTyping() {
+    if (this.typingSound && this.typingSound.isPlaying) {
+      this.typingSound.stop();
+    }
+  }
+
+  destroy() {
+    this.stopTyping();
+  }
+}
+
+// TerminalKeyboardHandler.js - Manejo de teclado
+export class TerminalKeyboardHandler {
+  constructor(scene) {
+    this.scene = scene;
+    this.listeners = new Map();
+  }
+
+  addListener(key, callback, context = null) {
+    this.removeListener(key);
+    const listener = this.scene.input.keyboard.on(`keydown-${key}`, callback, context);
+    this.listeners.set(key, listener);
+    return listener;
+  }
+
+  addGeneralListener(callback, context = null) {
+    this.removeGeneralListener();
+    const listener = this.scene.input.keyboard.on('keydown', callback, context);
+    this.listeners.set('general', listener);
+    return listener;
+  }
+
+  removeListener(key) {
+    if (this.listeners.has(key)) {
+      this.scene.input.keyboard.off(`keydown-${key}`, this.listeners.get(key));
+      this.listeners.delete(key);
+    }
+  }
+
+  removeGeneralListener() {
+    if (this.listeners.has('general')) {
+      this.scene.input.keyboard.off('keydown', this.listeners.get('general'));
+      this.listeners.delete('general');
+    }
+  }
+
+  removeAllListeners() {
+    this.listeners.forEach((listener, key) => {
+      if (key === 'general') {
+        this.scene.input.keyboard.off('keydown', listener);
+      } else {
+        this.scene.input.keyboard.off(`keydown-${key}`, listener);
+      }
+    });
+    this.listeners.clear();
+  }
+}
+
+// TerminalState.js - Estados del terminal
+export class TerminalState {
+  constructor() {
+    this.currentState = 'MAIN_MENU';
+    this.currentPage = 0;
+    this.currentQuestions = [];
+    this.currentDifficulty = '';
+  }
+
+  setState(state, data = {}) {
+    this.currentState = state;
+    Object.assign(this, data);
+  }
+
+  isMainMenu() {
+    return this.currentState === 'MAIN_MENU';
+  }
+
+  isQuestionList() {
+    return this.currentState === 'QUESTION_LIST';
+  }
+}
+
+// TerminalModal.js - Clase principal refactorizada
+export default class TerminalModal extends Phaser.Scene {
+  constructor() {
+    super({ key: 'TerminalModal' });
+    this.initializeComponents();
+  }
+
+  initializeComponents() {
+    this.bg = null;
+    this.cursor = null;
+    this.container = null;
+    this.renderer = null;
+    this.typingEffect = null;
+    this.soundManager = null;
+    this.keyboardHandler = null;
+    this.state = new TerminalState();
+  }
+
+  preload() {
+    this.soundManager = new TerminalSoundManager(this);
+    this.soundManager.preload();
+  }
+
+  create() {
+    this.setupScene();
+    this.showMainMenu();
+    this.setupSceneEvents();
+  }
+
+  setupScene() {
+    const { width, height } = this.sys.game.canvas;
+    
+    // Crear contenedor principal
+    this.container = this.add.container(0, 0).setDepth(100);
+    
+    // Crear fondo
+    this.bg = this.add.rectangle(width / 2, height / 2, width, height, 
+      TERMINAL_CONFIG.BACKGROUND_COLOR, TERMINAL_CONFIG.BACKGROUND_ALPHA);
+    this.container.add(this.bg);
+    
+    // Inicializar componentes
+    this.renderer = new TerminalRenderer(this, this.container);
+    this.soundManager.init();
+    this.typingEffect = new TerminalTypingEffect(this, this.renderer, this.soundManager);
+    this.keyboardHandler = new TerminalKeyboardHandler(this);
+    
+    // Crear cursor
+    this.cursor = this.renderer.createCursor(TERMINAL_CONFIG.TEXT_PADDING, TERMINAL_CONFIG.TEXT_PADDING);
+  }
+
+  showMainMenu() {
+    this.state.setState('MAIN_MENU');
+    this.renderer.clearContent([this.bg, this.cursor]);
+    
+    this.typingEffect.typeLines(
+      MENU_DATA.MAIN_MENU_LINES,
+      this.cursor,
+      () => this.setupMainMenuInput()
+    );
+  }
+
+  setupMainMenuInput() {
+    this.keyboardHandler.addGeneralListener((event) => {
+      const preguntasPorDificultad = this.registry.get('preguntasPorDificultad');
+      const preguntas = preguntasPorDificultad?.[event.key];
+
+      if (preguntas?.length > 0) {
+        this.showQuestionsMenu(preguntas, event.key);
+      } else if (event.key === 'Escape') {
+        this.exitTerminal();
+      }
+    });
+  }
+
+  showQuestionsMenu(preguntas, difficulty) {
+    this.state.setState('QUESTION_LIST', {
+      currentQuestions: preguntas,
+      currentDifficulty: difficulty,
+      currentPage: 0
+    });
+    
+    this.renderQuestionsPage();
+    this.setupQuestionsInput();
+  }
+
+  renderQuestionsPage() {
+    const { currentQuestions, currentDifficulty, currentPage } = this.state;
+    const startIndex = currentPage * TERMINAL_CONFIG.PAGE_SIZE;
+    const endIndex = Math.min(startIndex + TERMINAL_CONFIG.PAGE_SIZE, currentQuestions.length);
+    const pageQuestions = currentQuestions.slice(startIndex, endIndex);
+    
+    const lines = this.buildQuestionsLines(pageQuestions, currentDifficulty, currentQuestions.length);
+    
+    this.renderer.clearContent([this.bg, this.cursor]);
+    
+    const renderedLines = this.typingEffect.typeLines(
+      lines,
+      this.cursor,
+      () => this.makeQuestionsInteractive(pageQuestions, renderedLines),
+      TERMINAL_CONFIG.FAST_TYPING_DELAY
+    );
+  }
+
+  buildQuestionsLines(pageQuestions, difficulty, totalQuestions) {
+    const { currentPage } = this.state;
+    const startNumber = currentPage * TERMINAL_CONFIG.PAGE_SIZE + 1;
+    
+    return [
+      '',
+      `> DIFICULTAD: ${difficulty.toUpperCase()} — ${totalQuestions} preguntas`,
+      '',
+      '> SELECCIONA UNA PREGUNTA:',
+      ...pageQuestions.map((q, i) => `[${startNumber + i}] ${q.pregunta}`),
+      '',
+      '[N] Siguiente  [P] Anterior  [ESC] Cancelar'
+    ];
+  }
+
+  makeQuestionsInteractive(pageQuestions, renderedLines) {
+    const questionStartIndex = 4; // Índice donde empiezan las preguntas en las líneas
+    
+    pageQuestions.forEach((question, i) => {
+      const line = renderedLines[questionStartIndex + i];
+      if (line) {
+        line.setInteractive();
+        line.on('pointerdown', () => {
+          this.exitTerminal();
+          this.scene.get('OfficeScene').launchQuestion(question);
+        });
+      }
+    });
+  }
+
+  setupQuestionsInput() {
+    this.keyboardHandler.removeAllListeners();
+    
+    this.keyboardHandler.addListener('N', () => {
+      if (this.canGoToNextPage()) {
+        this.state.currentPage++;
+        this.renderQuestionsPage();
+      }
+    });
+    
+    this.keyboardHandler.addListener('P', () => {
+      if (this.canGoToPreviousPage()) {
+        this.state.currentPage--;
+        this.renderQuestionsPage();
+      }
+    });
+    
+    this.keyboardHandler.addListener('ESC', () => {
+      this.exitTerminal();
+    });
+  }
+
+  canGoToNextPage() {
+    const { currentPage, currentQuestions } = this.state;
+    return (currentPage + 1) * TERMINAL_CONFIG.PAGE_SIZE < currentQuestions.length;
+  }
+
+  canGoToPreviousPage() {
+    return this.state.currentPage > 0;
+  }
+
+  setupSceneEvents() {
+    this.events.on('wake', () => {
+      this.scene.pause('OfficeScene');
+      this.showMainMenu();
+    });
+  }
+
+  exitTerminal() {
+    this.cleanup();
+    this.scene.stop('TerminalModal');
+    this.scene.resume('OfficeScene');
+  }
+
+  cleanup() {
+    this.typingEffect?.stop();
+    this.soundManager?.destroy();
+    this.keyboardHandler?.removeAllListeners();
+  }
+
+  // Método para facilitar testing y debugging
+  getCurrentState() {
+    return {
+      state: this.state.currentState,
+      page: this.state.currentPage,
+      questionsCount: this.state.currentQuestions.length,
+      difficulty: this.state.currentDifficulty
+    };
   }
 }

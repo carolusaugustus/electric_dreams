@@ -97,7 +97,7 @@ function parseCSV(csvText) {
       console.warn(`Pregunta inválida o dificultad no soportada: ${json.nivel} (Dificultad: ${dificultad})`);
     }
   }
-  console.log(preguntasPorDificultad); // Depuración: muestra el objeto final
+  
   return preguntasPorDificultad;
 }
 
