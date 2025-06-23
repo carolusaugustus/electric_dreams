@@ -27,14 +27,12 @@ export default class MainMenu extends Phaser.Scene {
     // Crear grupo para opciones de menú (inicialmente invisible)
     this.menuOptions = this.add.group();
     const options = ['Modo Historia', 'Modo Infinito', 'Modo Agente', 'Ajustes'];
-
     // Mostrar opciones después de 5 segundos
     this.time.delayedCall(1000, () => {
       options.forEach((text, index) => {
       const menuItem = this.add.text
         (width * 0.2, height * 0.5 + index * 60, text, {
-        // fontFamily: 'VT323',
-        fontFamily: 'monospace',
+        fontFamily: this.sys.game.registry.get('retroFontFamily'),
         fontSize: '28px',
         color: '#00FF00'
       })

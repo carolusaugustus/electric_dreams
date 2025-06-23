@@ -16,3 +16,6 @@ const config = {
 };
 
 const mainGame = new Phaser.Game(config);
+//Global settings
+mainGame.registry.set('retroFontFamily','VT323');
+// mainGame.registry.set('retroFontFamily','monospace');

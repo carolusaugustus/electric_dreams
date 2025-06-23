@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Test de Parpadeo - Electric Dreams</title>
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.js"></script>
+  <style>
+    body { margin: 0; background: #000; color: #0ff; font-family: monospace; }
+    #controls {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 10;
+    }
+    label {
+      display: inline-block;
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="controls">
+  <label>Parpadeos por minuto:
+    <input type="range" id="bpm" min="1" max="60" value="10" />
+    <span id="bpmValue">10</span>
+  </label>
+</div>
+
+<script>
+const frames = [
+  'assets/blink_1.png', 'assets/blink_2.png', 'assets/blink_3.png', 'assets/blink_4.png',
+  'assets/blink_5.png', 'assets/blink_2.png', 'assets/blink_1.png'
+];
+
+const config = {
+  type: Phaser.AUTO,
+  width: 1080,
+  height: 1080,
+  transparent: true,
+  parent: document.body,
+  scene: {
+    preload,
+    create,
+    blink
+  }
+};
+
+let eye;
+let frameIndex = 0;
+let timer = 0;
+let blinkInterval = 3000; // default: 10 bpm
+
+const game = new Phaser.Game(config);
+
+function preload() {
+  frames.forEach((frame, i) => {
+    this.load.image(`frame${i}`, frame);
+  });
+}
+
+function create() {
+  eye = this.add.image(config.width/2, config.height/2, 'frame0');
+
+  const bpmSlider = document.getElementById('bpm');
+  const bpmValue = document.getElementById('bpmValue');
+
+  bpmSlider.addEventListener('input', () => {
+    const bpm = parseInt(bpmSlider.value);
+    bpmValue.textContent = bpm;
+    blinkInterval = 30000 / bpm; // Convert BPM to ms per blink
+  });
+
+  // Start first blink
+  this.time.addEvent({
+    delay: blinkInterval,
+    loop: true,
+    callback: () => blink(this)
+  });
+}
+
+function blink(scene) {
+  const sequence = [0, 1, 2, 3, 4, 5, 6];
+  let i = 0;
+
+  scene.time.addEvent({
+    delay: 50,
+    repeat: sequence.length - 1,
+    callback: () => {
+      eye.setTexture(`frame${sequence[i]}`);
+      i++;
+    }
+  });
+}
+</script>
+</body>
+</html>

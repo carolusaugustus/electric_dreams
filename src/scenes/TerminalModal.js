@@ -3,7 +3,7 @@ export const TERMINAL_CONFIG = {
   TYPING_DELAY: 25,
   FAST_TYPING_DELAY: 5,
   LINE_HEIGHT: 22,
-  FONT_SIZE: '16px',
+  FONT_SIZE: '24px',
   FONT_FAMILY: 'monospace',
   COLOR: '#00ff00',
   BACKGROUND_COLOR: 0x000000,
@@ -37,7 +37,8 @@ export const MENU_DATA = {
 
 // TerminalRenderer.js - Manejo de renderizado
 export class TerminalRenderer {
-  constructor(scene, container) {
+  constructor(scene, container, fontFamily) {
+    this.fontFamily = fontFamily;
     this.scene = scene;
     this.container = container;
     this.config = TERMINAL_CONFIG;
@@ -45,7 +46,8 @@ export class TerminalRenderer {
 
   createTextLine(text, x, y, addToContainer = true) {
     const textObj = this.scene.add.text(x, y, text, {
-      fontFamily: this.config.FONT_FAMILY,
+      // fontFamily: this.config.FONT_FAMILY,
+      fontFamily: this.fontFamily,
       fontSize: this.config.FONT_SIZE,
       color: this.config.COLOR
     });
@@ -307,7 +309,7 @@ export default class TerminalModal extends Phaser.Scene {
     this.container.add(this.bg);
     
     // Inicializar componentes
-    this.renderer = new TerminalRenderer(this, this.container);
+    this.renderer = new TerminalRenderer(this, this.container, this.sys.game.registry.get('retroFontFamily'));
     this.soundManager.init();
     this.typingEffect = new TerminalTypingEffect(this, this.renderer, this.soundManager);
     this.keyboardHandler = new TerminalKeyboardHandler(this);
