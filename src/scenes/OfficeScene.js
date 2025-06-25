@@ -8,11 +8,11 @@ export default class OfficeScene extends Phaser.Scene {
     this.load.image('city', 'assets/city.png');
     this.load.image('office', 'assets/office.png');
     this.load.image('subject', 'assets/profiles/others/neutral_sit_1.png');
-    this.load.image('rain1', '/assets/rain_drop_sprite_1.png');
-    this.load.image('rain2', '/assets/rain_drop_sprite_2.png');
-    this.load.image('rain3', '/assets/rain_drop_sprite_3.png');
-    this.load.image('rain_trace', '/assets/rain_trace.png');
-    this.load.image('hud_data', '/assets/HUD_Data_v2.png');
+    this.load.image('rain1', 'assets/rain_drop_sprite_1.png');
+    this.load.image('rain2', 'assets/rain_drop_sprite_2.png');
+    this.load.image('rain3', 'assets/rain_drop_sprite_3.png');
+    this.load.image('rain_trace', 'assets/rain_trace.png');
+    this.load.image('hud_data', 'assets/HUD_Data_v2.png');
     this.load.image('hud_questions', 'assets/HUD_Questions.png');
     this.load.image('btn_questions', 'assets/questions_button.png');
 
