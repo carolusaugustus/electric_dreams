@@ -18,6 +18,10 @@ export default class OfficeScene extends Phaser.Scene {
 
     // Audio
     this.load.audio('in_game_music', 'assets/in_game_audio.m4a');
+    // Loading blink sprites
+    for (let i = 1; i <= 7; i++) {
+      this.load.image(`eye_frame_${i}`, `assets/blink_${i}.png`);
+    }
   }
 
   create() {
@@ -305,9 +309,84 @@ export default class OfficeScene extends Phaser.Scene {
     //   fontSize: '16px',
     //   color: '#00ffcc'
     // }).setOrigin(0.5).setDepth(5);
+
+    //Blinking setup
+    // this.eyeSprite = this.add.image(400, 190, 'eye_frame_1') // posición inicial
+    //   .setScale(150 / 128) // Escalado a ~150px suponiendo sprites de 128px
+    //   .setAngle(10) // rotación a la derecha
+    //   .setVisible(false) // oculto por defecto
+    //   .setOrigin(0.5, 0.5) // centrado
+    //   .setDepth(100);
+    this.eyeSprite = this.add.image(380, 490, 'eye_frame_1')
+      .setScale(.12) // ≈1.17x escalado
+      .setAngle(-10) // girado a la derecha
+      .setVisible(false)
+      .setOrigin(0.5, 0.5)
+      .setDepth(100);
+  }
+
+  launchQuestion(question) {
+    console.log(question);
+    // this.blinkEye();
+    this.startEyeBlinking();
   }
 
   update() {
     // Lluvia ahora gestionada por partículas, no es necesario hacer scroll.
   }
+
+  blinkEye() {
+    const blinkFrames = ['eye_frame_1', 'eye_frame_2', 'eye_frame_3', 'eye_frame_4', 'eye_frame_5', 'eye_frame_3', 'eye_frame_1'];
+    let i = 0;
+
+    this.eyeSprite.setVisible(true);
+
+    this.time.addEvent({
+      delay: 50,
+      repeat: blinkFrames.length - 1,
+      callback: () => {
+        this.eyeSprite.setTexture(blinkFrames[i]);
+        i++;
+        if (i === blinkFrames.length) {
+          this.eyeSprite.setVisible(false); // ocultar al final
+        }
+      }
+    });
+  }
+
+  startEyeBlinking() {
+    if (!this.eyeSprite) return;
+
+    this.eyeSprite.setVisible(true);
+
+    const blinkFrames = [
+      'eye_frame_1', 'eye_frame_2', 'eye_frame_3', 'eye_frame_4',
+      'eye_frame_5', 'eye_frame_3', 'eye_frame_1'
+    ];
+
+    let frameIndex = 0;
+
+    // Guardamos el evento para poder cancelarlo más tarde
+    this.blinkTimer = this.time.addEvent({
+      delay: 100, // cada frame del parpadeo
+      loop: true,
+      callback: () => {
+        this.eyeSprite.setTexture(blinkFrames[frameIndex]);
+        frameIndex++;
+        if (frameIndex >= blinkFrames.length) {
+          frameIndex = 0;
+
+          // Espera aleatoria entre parpadeos
+          this.time.delayedCall(Phaser.Math.Between(2000, 5000), () => {
+            frameIndex = 0;
+          });
+          this.blinkTimer.paused = true;
+          this.time.delayedCall(Phaser.Math.Between(2000, 4000), () => {
+            this.blinkTimer.paused = false;
+          });
+        }
+      }
+    });
+  }
+
 }
