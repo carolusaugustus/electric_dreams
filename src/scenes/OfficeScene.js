@@ -357,7 +357,11 @@ export default class OfficeScene extends Phaser.Scene {
   startEyeBlinking() {
     if (!this.eyeSprite) return;
 
-    this.eyeSprite.setVisible(true);
+    // Mesh Start
+    this.testCustomMesh('eye_frame_1');
+    // Mesh End
+
+    this.eyeSprite.setVisible(false);//set to true to view
 
     const blinkFrames = [
       'eye_frame_1', 'eye_frame_2', 'eye_frame_3', 'eye_frame_4',
@@ -387,6 +391,48 @@ export default class OfficeScene extends Phaser.Scene {
         }
       }
     });
+  }
+
+  testCustomMesh(textureKey) {
+    console.log('🧪 Test final: Mesh con vértices relativos y debug', 'info');
+
+    try {
+      const meshX = 694;
+      const meshY = 930;
+
+      const vertices = [
+        -133, -100,   // v0 top-left
+          83, -107,   // v1 top-right
+        -85,  116,   // v2 bottom-left
+        133,   90    // v3 bottom-right
+      ];
+
+      const uvs = [
+        0, 0,
+        1, 0,
+        0, 1,
+        1, 1
+      ];
+
+      const indices = [0, 1, 2, 2, 1, 3];
+
+      const mesh = this.add.mesh(meshX, meshY, textureKey, null, vertices, uvs, indices, false);
+      mesh.setDepth(100);
+      console.log('✅ Mesh insertado correctamente', 'success');
+
+      // Dibujamos vértices como puntos para confirmar dónde cae cada esquina
+      const graphics = this.add.graphics({ lineStyle: { width: 2, color: 0xff0000 } });
+      for (let i = 0; i < vertices.length; i += 2) {
+        const vx = meshX + vertices[i];
+        const vy = meshY + vertices[i + 1];
+        graphics.strokeCircle(vx, vy, 6);
+      }
+
+      console.log('🟢 Puntos de vértices trazados', 'success');
+
+    } catch (e) {
+      console.log(`❌ Error creando mesh en pantalla: ${e.message}`, 'error');
+    }
   }
 
 }
