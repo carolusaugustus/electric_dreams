@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Diagnóstico Phaser - Test Completo</title>
+  <title>Phaser Mesh</title>
   <script src="https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.js"></script>
   <style>
     body {
@@ -38,215 +38,117 @@
     .info { background: #0a2d5d; }
   </style>
 </head>
-<body>
-
-<div id="debug-info">
-  <h2>🔍 Diagnóstico de Phaser</h2>
-  <div id="status-list">
-    <div class="status info">Iniciando diagnóstico...</div>
-  </div>
-</div>
-
-<div id="game-container"></div>
-
-<script>
-// Sistema de debug
-const DEBUG = {
-  log: function(message, type = 'info') {
-    const statusList = document.getElementById('status-list');
-    const div = document.createElement('div');
-    div.className = `status ${type}`;
-    div.textContent = message;
-    statusList.appendChild(div);
-    console.log(`[${type.toUpperCase()}] ${message}`);
-  }
-};
-
-DEBUG.log('🚀 Iniciando sistema de diagnóstico');
-
-class TestScene extends Phaser.Scene {
-    constructor() {
-        super('TestScene');
-        DEBUG.log('✅ Escena creada correctamente', 'success');
+<body style="margin: 0; background: black">
+    <script>
+class Example extends Phaser.Scene
+{
+    constructor ()
+    {
+        super();
     }
 
-    preload() {
-        DEBUG.log('📥 Iniciando carga de recursos');
-        
-        // Test 1: Crear una imagen simple en código
-        this.load.image('test_square', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAG0lEQVQIHWPY9+8fAzYwirkTm38U80mxBwwAAFAQBgFD+LqYAAAAAElFTkSuQmCC');
-        
-        // Test 2: Intentar cargar tu imagen
-        this.load.image('blink1', 'assets/blink_1.png');
-        
-        // Eventos de carga
-        this.load.on('filecomplete', (key) => {
-            DEBUG.log(`✅ Archivo cargado: ${key}`, 'success');
+    preload ()
+    {
+        //this.load.setBaseURL('https://cdn.phaserfiles.com/v385');
+        //this.load.image('bg', 'assets/skies/gradient13.png');
+        this.load.image('brick', ['assets/blink_1.png', 'assets/blink_2.png']);
+    }
+
+    create ()
+    {
+        this.lights.enable();
+        this.lights.setAmbientColor(0x808080);
+
+        var spotlight = this.lights.addLight(400, 300, 280).setIntensity(3);
+
+        this.input.on('pointermove', function (pointer) {
+
+            spotlight.x = pointer.x;
+            spotlight.y = pointer.y;
+
         });
-        
-        this.load.on('loaderror', (file) => {
-            DEBUG.log(`❌ Error cargando: ${file.key} - ${file.src}`, 'error');
+
+        //this.add.image(400, 300, 'bg').setFlip(false, true);
+
+        const mesh = this.add.mesh(400, 300, 'brick');
+
+        Phaser.Geom.Mesh.GenerateGridVerts({
+            mesh,
+            widthSegments: 6
         });
-        
-        this.load.on('complete', () => {
-            DEBUG.log('📦 Carga completada', 'success');
+
+        mesh.hideCCW = false;
+
+        mesh.panZ(3.5);
+
+        mesh.setPipeline('Light2D');
+
+        this.debug = this.add.graphics();
+
+        this.add.text(16, 16, 'Rotate with mouse (+ Shift to pan)\nWheel to zoom\nD to toggle debug');
+
+        this.input.keyboard.on('keydown-D', () => {
+
+            if (mesh.debugCallback)
+            {
+                mesh.setDebug();
+            }
+            else
+            {
+                mesh.setDebug(this.debug);
+            }
+
+        });
+
+        const rotateRate = 1;
+        const panRate = 1;
+        const zoomRate = 4;
+
+        this.input.on('pointermove', pointer => {
+
+            if (!pointer.isDown)
+            {
+                return;
+            }
+
+            if (!pointer.event.shiftKey)
+            {
+                mesh.modelRotation.y += pointer.velocity.x * (rotateRate / 800);
+                mesh.modelRotation.x += pointer.velocity.y * (rotateRate / 600);
+            }
+            else
+            {
+                mesh.panX(pointer.velocity.x * (panRate / 800));
+                mesh.panY(pointer.velocity.y * (panRate / 600));
+            }
+
+        });
+
+        this.input.on('wheel', (pointer, over, deltaX, deltaY, deltaZ) => {
+
+            mesh.panZ(deltaY * (zoomRate / 600));
+
         });
     }
 
-    create() {
-        DEBUG.log('🎨 Iniciando creación de objetos');
-        
-        // Test 1: Verificar que Phaser funciona básicamente
-        this.add.text(20, 20, '¡Phaser funciona!', {
-            fontSize: '24px',
-            fill: '#00ff00'
-        });
-        DEBUG.log('✅ Texto creado correctamente', 'success');
-        
-        // Test 2: Crear un rectángulo simple
-        const rect = this.add.rectangle(100, 100, 50, 50, 0xff0000);
-        DEBUG.log('✅ Rectángulo creado correctamente', 'success');
-        
-        // Test 3: Verificar si la imagen de test carga
-        if (this.textures.exists('test_square')) {
-            const testImg = this.add.image(200, 100, 'test_square');
-            testImg.setScale(20); // Hacer más grande el pixel
-            DEBUG.log('✅ Imagen de test mostrada', 'success');
-        } else {
-            DEBUG.log('❌ Imagen de test no encontrada', 'error');
-        }
-        
-        // Test 4: Verificar tu imagen
-        if (this.textures.exists('blink1')) {
-            const yourImg = this.add.image(300, 100, 'blink1');
-            DEBUG.log('✅ Tu imagen (blink1) cargada correctamente', 'success');
-            
-            // Test 5: Intentar crear un mesh básico
-            this.testBasicMesh();
-        } else {
-            DEBUG.log('❌ Tu imagen (blink1) no se pudo cargar', 'error');
-            DEBUG.log('⚠️ Creando mesh con imagen de test', 'warning');
-            this.testBasicMesh('test_square');
-        }
-        
-        // Test 6: Información del sistema
-        DEBUG.log(`📊 Renderer: ${this.sys.game.renderer.type === 0 ? 'Canvas' : 'WebGL'}`, 'info');
-        DEBUG.log(`📊 Versión Phaser: ${Phaser.VERSION}`, 'info');
-    }
-    
-    testBasicMesh(textureKey = 'blink1') {
-        DEBUG.log(`🔧 Intentando crear mesh con: ${textureKey}`, 'info');
-        
-        try {
-            // Crear mesh básico SIN modificaciones
-            const mesh = this.add.mesh(400, 200, textureKey);
-            DEBUG.log('✅ Mesh básico creado', 'success');
-            
-            // Verificar propiedades del mesh
-            DEBUG.log(`📊 Mesh vertices: ${mesh.vertices ? mesh.vertices.length : 'undefined'}`, 'info');
-            DEBUG.log(`📊 Mesh visible: ${mesh.visible}`, 'info');
-            DEBUG.log(`📊 Mesh activo: ${mesh.active}`, 'info');
-            
-            // Test 7: Intentar crear geometría personalizada
-            this.testCustomMesh(textureKey);
-            
-        } catch (error) {
-            DEBUG.log(`❌ Error creando mesh: ${error.message}`, 'error');
-        }
-    }
-    /*
-    testCustomMesh(textureKey) {
-        DEBUG.log('🔧 Intentando crear mesh con geometría personalizada', 'info');
-        
-        try {
-            const customMesh = this.add.mesh(400, 300, textureKey);
-            
-            // Geometría simple de cuadrado
-            const vertices = [-32, -32, 32, -32, 32, 32, -32, 32];
-            const uvs = [0, 0, 1, 0, 1, 1, 0, 1];
-            const indices = [0, 1, 2, 0, 2, 3];
-            
-            customMesh.addVertices(vertices, uvs, indices);
-            DEBUG.log('✅ Mesh personalizado creado', 'success');
-            
-            // Test 8: Intentar efecto trapezoidal
-            this.testTrapezoidEffect(customMesh);
-            
-        } catch (error) {
-            DEBUG.log(`❌ Error con mesh personalizado: ${error.message}`, 'error');
-        }
-    }
-    */
-
-    testCustomMesh(textureKey) {
-        DEBUG.log('🔧 Insertando sprite deformado en pantalla inclinada', 'info');
-
-        try {
-            const vertices = [
-                561, 830,     // top-left
-                777, 823,     // top-right
-                609, 1046,    // bottom-left
-                827, 1020     // bottom-right
-            ];
-
-            const uvs = [
-                0, 0,  // top-left
-                1, 0,  // top-right
-                0, 1,  // bottom-left
-                1, 1   // bottom-right
-            ];
-
-            const indices = [0, 1, 2, 2, 1, 3];
-
-            const mesh = this.add.mesh(0, 0, textureKey, null, vertices, uvs, indices, false);
-
-            DEBUG.log('✅ Sprite del ojo deformado e insertado en pantalla', 'success');
-        } catch (e) {
-            DEBUG.log(`❌ Error creando mesh en pantalla: ${e.message}`, 'error');
-        }
-    }
-
-
-
-    testTrapezoidEffect(mesh) {
-        DEBUG.log('🔧 Aplicando efecto trapezoidal', 'info');
-        
-        try {
-            // Modificar vértices superiores
-            mesh.vertices[0] = -16; // Top-left x
-            mesh.vertices[2] = 16;  // Top-right x
-            mesh.dirty = true;
-            
-            DEBUG.log('✅ Efecto trapezoidal aplicado', 'success');
-            
-        } catch (error) {
-            DEBUG.log(`❌ Error aplicando efecto: ${error.message}`, 'error');
-        }
+    update ()
+    {
+        this.debug.clear();
+        this.debug.lineStyle(1, 0x00ff00);
     }
 }
 
-// Configuración de Phaser con debug
 const config = {
     type: Phaser.AUTO,
-    width: 600,
-    height: 400,
-    parent: 'game-container',
-    scene: TestScene,
-    backgroundColor: '#444444',
-    physics: {
-        default: 'arcade'
-    }
+    width: 800,
+    height: 600,
+    backgroundColor: '#0a440a',
+    //parent: 'phaser-example',
+    scene: Example
 };
 
-DEBUG.log('⚙️ Configuración de Phaser preparada');
-
-try {
-    const game = new Phaser.Game(config);
-    DEBUG.log('🎮 Juego iniciado correctamente', 'success');
-} catch (error) {
-    DEBUG.log(`❌ Error crítico iniciando Phaser: ${error.message}`, 'error');
-}
-</script>
+let game = new Phaser.Game(config);
+    </script>
 
 </body>
 </html>
