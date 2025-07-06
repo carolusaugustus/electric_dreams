@@ -50,15 +50,19 @@ class Example extends Phaser.Scene
     preload ()
     {
         //this.load.setBaseURL('https://cdn.phaserfiles.com/v385');
-        //this.load.image('bg', 'assets/skies/gradient13.png');
+        this.load.image('bg', 'assets/office.png');
+        this.load.image('office', 'assets/office.png');
         this.load.image('brick', ['assets/blink_1.png', 'assets/blink_2.png']);
     }
 
     create ()
     {
-        this.lights.enable();
-        this.lights.setAmbientColor(0x808080);
+        //this.lights.enable();
+        this.lights.setAmbientColor(0xffffff);
 
+        const { width, height } = this.sys.game.canvas;
+
+        /*
         var spotlight = this.lights.addLight(400, 300, 280).setIntensity(3);
 
         this.input.on('pointermove', function (pointer) {
@@ -67,10 +71,20 @@ class Example extends Phaser.Scene
             spotlight.y = pointer.y;
 
         });
+        */
 
-        //this.add.image(400, 300, 'bg').setFlip(false, true);
+        // OFICINA
+        this.office = this.add.image(0, 0, 'office')
+            .setOrigin(0)
+            .setDisplaySize(width, height)
+            .setDepth(0);
 
-        const mesh = this.add.mesh(400, 300, 'brick');
+        //this.add.image(400, 300, 'bg');
+            //.setFlip(false, true);
+
+        const mesh = this.add.mesh(350, 500, 'brick').setDepth(1);
+
+        this.mesh = mesh;
 
         Phaser.Geom.Mesh.GenerateGridVerts({
             mesh,
@@ -81,7 +95,10 @@ class Example extends Phaser.Scene
 
         mesh.panZ(3.5);
 
-        mesh.setPipeline('Light2D');
+        mesh.modelRotation.set( -0.4395025188621427, 0.5779315140156901, 0);
+        mesh.setScale(0.19, 0.19, 0.18);
+
+        //mesh.setPipeline('Light2D');
 
         this.debug = this.add.graphics();
 
@@ -98,6 +115,11 @@ class Example extends Phaser.Scene
                 mesh.setDebug(this.debug);
             }
 
+            console.log(`Has : ${mesh.hasTransformComponent}`);
+            console.log(`Model Rotation: ${mesh.modelRotation.x}, ${mesh.modelRotation.y}`);
+            console.log(`Mesh Position: ${mesh.x}, ${mesh.y}, ${mesh.z}`);
+            console.log(`Mesh Scale: ${mesh.scaleX}, ${mesh.scaleY}, ${mesh.scaleZ}`);
+            //console.log(`Mesh Pan: ${mesh.panX}, ${mesh.panY}, ${mesh.panZ}`);
         });
 
         const rotateRate = 1;
@@ -121,28 +143,33 @@ class Example extends Phaser.Scene
                 mesh.panX(pointer.velocity.x * (panRate / 800));
                 mesh.panY(pointer.velocity.y * (panRate / 600));
             }
-
+            //console.log(`Pointer moved: ${pointer.velocity.x}, ${pointer.velocity.y}`);
+            //console.log(`Model Rotation: ${mesh.modelRotation.x}, ${mesh.modelRotation.y}`);
         });
 
         this.input.on('wheel', (pointer, over, deltaX, deltaY, deltaZ) => {
 
             mesh.panZ(deltaY * (zoomRate / 600));
-
+            //console.log(`Pointer wheel: ${deltaY * (zoomRate / 600)}`);
         });
     }
 
     update ()
     {
         this.debug.clear();
-        this.debug.lineStyle(1, 0x00ff00);
+        this.debug.lineStyle(1, 0x00ff00);    
     }
 }
 
 const config = {
     type: Phaser.AUTO,
-    width: 800,
-    height: 600,
-    backgroundColor: '#0a440a',
+    scale: {
+        mode: Phaser.Scale.RESIZE,
+        autoCenter: Phaser.Scale.CENTER_BOTH
+    },
+    //width: 800,
+    //height: 600,
+    backgroundColor: '#000000',
     //parent: 'phaser-example',
     scene: Example
 };
